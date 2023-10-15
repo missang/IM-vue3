@@ -1,23 +1,16 @@
 <template>
 	<div class="select-none">
+		<div class="mini_qr">
+			<img src="/@/assets/qrcode.png" />
+			<p>{{ t('scan.wechatApp') }}</p>
+		</div>
+		<div class="login-container">
 		<div class="tenant">
 			<!--  租户选择 -->
 			<tenant />
 		</div>
-		<!-- <div class="mini_qr">
-			<img :src="miniQr" />
-			<p>{{ t('scan.wechatApp') }}</p>
-		</div> -->
-		<!-- <img src="/@/assets/login_bg.png" class="wave" /> -->
-		<!-- <el-image src="/@/assets/login_bg.png" fit="fill" class="wave" lazy  /> -->
-		<div class="flex-c absolute right-5 top-3"></div>
-		<div class="login-container">
-			<!-- <div class="img">
-				<img :src="illustration" />
-			</div> -->
 			<div class="login-box">
 				<div class="login-form">
-					<div class="login-title">{{ getThemeConfig.globalTitle }}</div>
 					<el-tabs v-model="tabsActiveName" >
 						<el-tab-pane :label="$t('label.one1')" name="account">
 							<Password @signInSuccess="signInSuccess" />
@@ -34,6 +27,15 @@
 					</el-tabs>
 					
 				</div>
+			</div>
+		</div>
+		<div  class="login-right">
+			<div>
+
+				<div class="login-title">{{ getThemeConfig.globalTitle }}</div><img src="/@/assets/login_bg.png" />
+
+
+				<div class="toServer">{{$t('toServer')}}</div>
 			</div>
 		</div>
 	</div>
@@ -79,14 +81,11 @@ const getThemeConfig = computed(() => {
 
 // 登录成功后的跳转处理事件
 const signInSuccess = async () => {
-	const isNoPower = await initBackEndControlRoutes();
-	if (isNoPower) {
-		useMessage().wraning('抱歉，您没有登录权限');
-		Session.clear();
-	} else {
+	
 		// 初始化登录成功时间问候语
 		let currentTimeInfo = formatAxis(new Date());
-		if (route.query?.redirect) {
+		console.log(route.query?.redirect)
+		if (route.query?.redirect&& route.query?.redirect !=='/') {
 			router.push({
 				path: <string>route.query?.redirect,
 				query: Object.keys(<string>route.query?.params).length > 0 ? JSON.parse(<string>route.query?.params) : '',
@@ -94,16 +93,17 @@ const signInSuccess = async () => {
 		} else {
 			router.push('/');
 		}
+		console.log(222)
 		// 登录成功提示
 		const signInText = t('signInText');
 		useMessage().success(`${currentTimeInfo}，${signInText}`);
 		// 添加 loading，防止第一次进入界面时出现短暂空白
-		NextLoading.start();
-	}
+		// NextLoading.start();
+		// NextLoading.done();
 };
 
 // 页面加载时
 onMounted(() => {
-	NextLoading.done();
+	// NextLoading.done();
 });
 </script>

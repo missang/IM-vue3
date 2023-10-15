@@ -1,5 +1,8 @@
 // 定义内容
 export default {
+	error:{
+		500:'系统异常请联系管理员'
+	},
 	router: {
 		home: '首页',
 		system: '系统设置',

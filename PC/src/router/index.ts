@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useKeepALiveNames } from '/@/stores/keepAliveNames';
 import { useRoutesList } from '/@/stores/routesList';
 import { Session } from '/@/utils/storage';
-import { staticRoutes, notFoundAndNoPower } from '/@/router/route';
+import { staticRoutes, notFoundAndNoPower,baseRoutes } from '/@/router/route';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
 
 /**
@@ -31,7 +31,7 @@ export const router = createRouter({
 	 * 2、backEnd.ts(后端控制路由)、frontEnd.ts(前端控制路由) 中也需要加 notFoundAndNoPower 404、401 界面。
 	 *    防止 404、401 不在 layout 布局中，不设置的话，404、401 界面将全屏显示
 	 */
-	routes: [...notFoundAndNoPower, ...staticRoutes],
+	routes: [...notFoundAndNoPower, ...staticRoutes,...baseRoutes],
 });
 
 console.log(222)
@@ -103,8 +103,10 @@ router.beforeEach(async (to, from, next) => {
 		} else {
 			const storesRoutesList = useRoutesList(pinia);
 			const { routesList } = storeToRefs(storesRoutesList);
+			console.log(routesList)
 			if (routesList.value.length === 0) {
 				// 后端控制路由：路由数据初始化，防止刷新时丢失
+				console.log(2222)
 				await initBackEndControlRoutes();
 				next({ path: to.path, query: to.query });
 			} else {

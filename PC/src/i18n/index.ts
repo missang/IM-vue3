@@ -2,7 +2,9 @@ import {createI18n} from 'vue-i18n';
 import pinia from '/@/stores/index';
 import {storeToRefs} from 'pinia';
 import {useThemeConfig} from '/@/stores/themeConfig';
-import {info} from '/@/api/common/i18n';
+import {info,getInitialize} from '/@/api/common/i18n';
+import other from '/@/utils/other';
+import { NextLoading } from '/@/utils/loading';
 
 // 定义语言国际化内容
 
@@ -58,6 +60,23 @@ for (const key in itemize) {
 const stores = useThemeConfig(pinia);
 const {themeConfig} = storeToRefs(stores);
 
+
+NextLoading.start();
+initialization()
+
+async function initialization() {
+    // await  getInitialize()
+    const initApp = {
+        app_log: "//immg.iloveclub.vip/upload/images/202310/096523e317fc45.png",
+        "lang_data": {
+            "id": "Indonesia",
+            "zh-ch": "简体中文"
+        },
+        lang_default:"en"
+    };
+	themeConfig.value.globalI18n = initApp.lang_default;
+   NextLoading.done();
+}
 // 导出语言国际化
 export const i18n = createI18n({
     legacy: false,
@@ -70,7 +89,7 @@ export const i18n = createI18n({
     messages,
 });
 
-fetchI18n()
+// fetchI18n()
 
 // 远程获取i18n
 async function fetchI18n() {

@@ -15,7 +15,7 @@ export const useThemeConfig = defineStore('themeConfig', {
 			 * 全局主题
 			 */
 			// 默认 primary 主题颜色
-			primary: '#2E5CF6',
+			primary: '#3C84F7',
 			// 是否开启深色模式
 			isIsDark: false,
 

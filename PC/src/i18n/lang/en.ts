@@ -1,4 +1,7 @@
 export default {
+	error:{
+		500:'System abnormality, please contact the administrator'
+	},
 	router: {
 		home: 'Home',
 		system: 'System',

@@ -8,7 +8,7 @@ import { defineStore } from 'pinia';
  */
 export const useRoutesList = defineStore('routesList', {
 	state: (): RoutesListState => ({
-		routesList: [],
+		routesList: [{}],
 		isColumnsMenuHover: false,
 		isColumnsNavHover: false,
 	}),

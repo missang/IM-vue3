@@ -60,8 +60,14 @@ export function refreshCache() {
  * @returns
  */
 export function info() {
-	return axios.get(import.meta.env.VITE_API_URL + '/admin/i18n/info');
+	return axios.get(import.meta.env.VITE_API_URL + '/h5/pop/get');
 }
+export function getInitialize() {
+	return axios.get(import.meta.env.VITE_API_URL + '/h5/pop/get');
+}
+
+
+
 
 export function validateName(rule: any, value: any, callback: any, isEdit: boolean) {
 	if (isEdit) {
@@ -92,6 +98,7 @@ export function validateZhCn(rule: any, value: any, callback: any, isEdit: boole
 		}
 	});
 }
+
 
 export function validateEn(rule: any, value: any, callback: any, isEdit: boolean) {
 	if (isEdit) {

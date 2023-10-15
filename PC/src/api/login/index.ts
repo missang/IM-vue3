@@ -18,16 +18,15 @@ export const login = (data: any) => {
 	const basicAuth = 'Basic ' + window.btoa(import.meta.env.VITE_OAUTH2_PASSWORD_CLIENT);
 	Session.set('basicAuth', basicAuth);
 	// 密码加密
-	const encPassword = other.encryption(data.password, import.meta.env.VITE_PWD_ENC_KEY);
-	const { username, randomStr, code, grant_type, scope } = data;
+	// const encPassword = other.encryption(data.password, import.meta.env.VITE_PWD_ENC_KEY);
+	const { username, password, code, grant_type, scope } = data;
+	console.log({ username, password })
 	return request({
-		url: '/auth/oauth2/token',
+		url: '/h5/login/check',
 		method: 'post',
-		params: { username, randomStr, code, grant_type, scope },
-		data: { password: encPassword },
+		// params: { username, password },
+		data: { username, password },
 		headers: {
-			skipToken: true,
-			Authorization: basicAuth,
 			'Content-Type': FORM_CONTENT_TYPE,
 		},
 	});
@@ -143,7 +142,7 @@ export const checkToken = (refreshTime: number, refreshLock: boolean) => {
  */
 export const getUserInfo = () => {
 	return request({
-		url: '/admin/user/info',
+		url: '/h5/user/getuserinfo',
 		method: 'get',
 	});
 };

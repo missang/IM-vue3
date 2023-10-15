@@ -105,7 +105,7 @@ export async function setAddRoute() {
  * @returns 返回后端路由菜单数据
  */
 export function getBackEndControlRoutes() {
-	return null
+	return []
 	// return menuApi.getAdminMenu();
 }
 

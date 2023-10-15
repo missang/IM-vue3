@@ -10,6 +10,7 @@ export default {
 		one3: '第三方登录',
 		two4: '友情链接',
 	},
+	toServer:"联系客服",
 	password: {
 		accountPlaceholder1: '请输入用户名',
 		accountPlaceholder2: '请输入密码',
@@ -28,7 +29,7 @@ export default {
 	},
 	scan: {
 		text: '打开手机扫一扫，快速登录/注册',
-		wechatApp: '微信扫码体验移动端',
+		wechatApp: '扫码体验移动端',
 	},
 	tenant_guide: {
 		title: '请选择租户，点击此处',

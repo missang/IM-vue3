@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import { Session } from '/@/utils/storage';
 import { getUserInfo, login, loginByMobile, loginBySocial, refreshTokenApi } from '/@/api/login/index';
-import other from '/@/utils/other';
+// import other from '/@/utils/other';
 import { useMessage } from '/@/hooks/message';
+
+import { i18n } from '/@/i18n';
+const { t } = i18n.global;
 
 /**
  * @function useUserInfo
@@ -28,19 +31,20 @@ export const useUserInfo = defineStore('userInfo', {
 		 * @returns {Promise<Object>}
 		 */
 		async login(data:any) {
-			data.grant_type = 'password';
-			data.scope = 'server';
+			// data.grant_type = 'password';
+			// data.scope = 'server';
 
 			return new Promise((resolve, reject) => {
 				login(data)
 					.then((res) => {
 						// 存储token 信息
-						Session.set('token', res.access_token);
-						Session.set('refresh_token', res.refresh_token);
+						console.log(res,8888)
+						Session.set('token', res.data.token);
+						Session.set('sso', res.data.sso);
 						resolve(res);
 					})
 					.catch((err) => {
-						useMessage().error(err?.msg || '系统异常请联系管理员');
+						useMessage().error(err?.msg || t('error.500'));
 						reject(err);
 					});
 			});
@@ -63,7 +67,7 @@ export const useUserInfo = defineStore('userInfo', {
 						resolve(res);
 					})
 					.catch((err) => {
-						useMessage().error(err?.msg || '系统异常请联系管理员');
+						useMessage().error(err?.msg || t('error.500'));
 						reject(err);
 					});
 			});
@@ -87,7 +91,7 @@ export const useUserInfo = defineStore('userInfo', {
 						resolve(res);
 					})
 					.catch((err) => {
-						useMessage().error(err?.msg || '系统异常请联系管理员');
+						useMessage().error(err?.msg || t('error.500'));
 						reject(err);
 					});
 			});
@@ -123,13 +127,14 @@ export const useUserInfo = defineStore('userInfo', {
 		 */
 		async setUserInfos() {
 			getUserInfo().then((res) => {
-				const userInfo: any = {
-					user: res.data.sysUser,
-					time: new Date().getTime(),
-					roles: res.data.roles,
-					authBtnList: res.data.permissions,
-				};
-				this.userInfos = userInfo;
+				console.log(res)
+				// const userInfo: any = {
+				// 	user: res.data.sysUser,
+				// 	time: new Date().getTime(),
+				// 	roles: res.data.roles,
+				// 	authBtnList: res.data.permissions,
+				// };
+				// this.userInfos = userInfo;
 			});
 		},
 	},

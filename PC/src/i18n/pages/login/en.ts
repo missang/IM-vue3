@@ -9,6 +9,7 @@ export default {
 		one3: 'Third party login',
 		two4: 'Links',
 	},
+	toServer:"To server",
 	password: {
 		accountPlaceholder1: 'The username "admin" is common, please use another',
 		accountPlaceholder2: 'Password',

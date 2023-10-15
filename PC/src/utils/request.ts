@@ -9,7 +9,7 @@ import other from './other';
  */
 const service: AxiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
-	timeout: 50000, // 全局超时时间
+	timeout: 300000, // 全局超时时间
 });
 
 /**
@@ -31,10 +31,14 @@ service.interceptors.request.use(
 
 		// 统一增加Authorization请求头, skipToken 跳过增加token
 		const token = Session.getToken();
-		if (token && !config.headers?.skipToken) {
-			config.headers![CommonHeaderEnum.AUTHORIZATION] = `Bearer ${token}`;
+		if (token) {
+			config.headers!['sso'] = token;
 		}
-
+		const sso = Session.getSso();
+		
+		if (sso) {
+			config.headers!['sso'] = sso;
+		}
 		// 统一增加TENANT-ID请求头
 		const tenantId = Session.getTenant();
 		if (tenantId) {
@@ -48,7 +52,14 @@ service.interceptors.request.use(
 				encryption: enc,
 			};
 		}
-
+		// JSON 字符串参数的格式转换
+		const params = new URLSearchParams()
+		for (const key in config.data) {
+		if (config.data.hasOwnProperty(key)) {
+			params.append(key, config.data[key])
+		}
+		}
+		config.data = params
 		// 自动适配单体和微服务架构不同的URL
 		config.url = other.adaptationUrl(config.url);
 

@@ -61,6 +61,7 @@ export const Session = {
 	// 移除全部临时缓存
 	clear() {
 		Cookies.remove('token');
+		Cookies.remove('sso');
 		Cookies.remove('refresh_token');
 		Cookies.remove('tenantId');
 		window.sessionStorage.clear();
@@ -68,6 +69,9 @@ export const Session = {
 	// 获取当前存储的 token
 	getToken() {
 		return this.get('token');
+	},
+	getSso() {
+		return this.get('sso');
 	},
 	// 获取当前的租户
 	getTenant() {
