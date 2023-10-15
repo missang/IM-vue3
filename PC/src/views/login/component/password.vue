@@ -4,7 +4,7 @@
 			<el-input text :placeholder="$t('password.accountPlaceholder1')" v-model="state.ruleForm.username" clearable autocomplete="off">
 				<template #prefix>
 					<el-icon class="el-input__icon">
-						<ele-User />
+						<el-icon><User /></el-icon>
 					</el-icon>
 				</template>
 			</el-input>
@@ -18,7 +18,7 @@
 			>
 				<template #prefix>
 					<el-icon class="el-input__icon">
-						<ele-Unlock />
+						<el-icon><Unlock /></el-icon>
 					</el-icon>
 				</template>
 				<template #suffix>

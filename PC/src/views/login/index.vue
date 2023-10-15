@@ -4,38 +4,35 @@
 			<!--  租户选择 -->
 			<tenant />
 		</div>
-		<div class="mini_qr">
-			<!-- 扫码体验移动端 -->
+		<!-- <div class="mini_qr">
 			<img :src="miniQr" />
 			<p>{{ t('scan.wechatApp') }}</p>
-		</div>
-		<img :src="bg" class="wave" />
+		</div> -->
+		<!-- <img src="/@/assets/login_bg.png" class="wave" /> -->
+		<!-- <el-image src="/@/assets/login_bg.png" fit="fill" class="wave" lazy  /> -->
 		<div class="flex-c absolute right-5 top-3"></div>
 		<div class="login-container">
-			<div class="img">
+			<!-- <div class="img">
 				<img :src="illustration" />
-			</div>
+			</div> -->
 			<div class="login-box">
 				<div class="login-form">
 					<div class="login-title">{{ getThemeConfig.globalTitle }}</div>
-					<el-tabs v-model="tabsActiveName">
-						<!-- 用户名密码登录 -->
+					<el-tabs v-model="tabsActiveName" >
 						<el-tab-pane :label="$t('label.one1')" name="account">
 							<Password @signInSuccess="signInSuccess" />
 						</el-tab-pane>
-						<!-- 手机号登录 -->
-						<el-tab-pane :label="$t('label.two2')" name="mobile">
+						<!-- <el-tab-pane :label="$t('label.two2')" name="mobile">
 							<Mobile @signInSuccess="signInSuccess" />
 						</el-tab-pane>
-						<!-- 社交登录 -->
 						<el-tab-pane :label="$t('label.three3')" name="social">
 							<Social @signInSuccess="signInSuccess" />
-						</el-tab-pane>
-						<!-- 注册 -->
-						<el-tab-pane :label="$t('label.register')" name="register" v-if="registerEnable">
+						</el-tab-pane> -->
+						<el-tab-pane :label="$t('label.register')" name="register">
 							<Register @afterSuccess="tabsActiveName = 'account'" />
 						</el-tab-pane>
 					</el-tabs>
+					
 				</div>
 			</div>
 		</div>
@@ -64,6 +61,7 @@ const Tenant = defineAsyncComponent(() => import('./component/tenant.vue'));
 // 定义变量内容
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
+console.log(themeConfig.value,999)
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();

@@ -43,6 +43,21 @@ const tenant = ref();
  * @returns Promise。
  */
 const getTenantList = () => {
+
+	
+let obj = 	{
+            "id": "Indonesia",
+            "zh-CN": "中文"
+        };
+
+
+		for(var key in obj){
+			tenantList.value.push( {
+							id:key,
+							name:obj[key]
+						})
+				}
+	return 
 	return fetchList().then((response) => {
 		// 从后端接口获取租户列表
 		tenantList.value = response.data;
@@ -97,8 +112,8 @@ const guide = () => {
 	});
 	driver.defineSteps(steps);
 	if (!Local.get('tenant-guide')) {
-		driver.start();
-		Local.set('tenant-guide', true);
+		// driver.start();
+		// Local.set('tenant-guide', true);
 	}
 };
 
@@ -118,9 +133,9 @@ onMounted(async () => {
 	await getTenantList(); // 获取租户列表
 	tenant.value = Session.getTenant(); // 从本地存储读取当前租户信息
 
-	if (autoTenantEnable.value) {
-		handleAutoTenant(); // 自动根据域名匹配租户信息
-	}
+	// if (autoTenantEnable.value) {
+	// 	handleAutoTenant(); // 自动根据域名匹配租户信息
+	// }
 
 	/**
 	 * 在下一帧中执行引导函数，确保 DOM 已渲染完成。

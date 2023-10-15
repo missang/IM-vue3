@@ -101,7 +101,7 @@ export const useThemeConfig = defineStore('themeConfig', {
 			// 是否开启水印
 			isWartermark: true,
 			// 水印文案
-			wartermarkText: 'PigX',
+			wartermarkText: 'IM Admin',
 
 			/**
 			 * 其它设置
@@ -133,7 +133,7 @@ export const useThemeConfig = defineStore('themeConfig', {
 			 * 全局网站标题 / 副标题
 			 */
 			// 网站主标题（菜单导航、浏览器当前网页标题、登录form顶部右侧）
-			globalTitle: '',
+			globalTitle: 'IM Admin',
 			// 网站副标题（登录左侧底部页顶部文字）
 			globalViceTitle: '',
 			// 网站副标题（登录页顶部文字）

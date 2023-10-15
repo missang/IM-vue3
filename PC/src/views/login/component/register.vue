@@ -4,7 +4,7 @@
 			<el-input text :placeholder="$t('password.accountPlaceholder1')" v-model="state.ruleForm.username" clearable autocomplete="off">
 				<template #prefix>
 					<el-icon class="el-input__icon">
-						<ele-User />
+						<el-icon><User /></el-icon>
 					</el-icon>
 				</template>
 			</el-input>
@@ -19,22 +19,22 @@
 				@score="handlePassScore"
 				><template #prefix>
 					<el-icon class="el-input__icon">
-						<ele-Unlock />
+						<el-icon><Unlock /></el-icon>
 					</el-icon>
 				</template>
 			</strength-meter>
 		</el-form-item>
-		<el-form-item class="login-animation3" prop="phone">
+		<!-- <el-form-item class="login-animation3" prop="phone">
 			<el-input text :placeholder="$t('password.phonePlaceholder4')" v-model="state.ruleForm.phone" clearable autocomplete="off">
 				<template #prefix>
 					<el-icon class="el-input__icon">
-						<ele-Position />
+						<el-icon><Position /></el-icon>
 					</el-icon>
 				</template>
 			</el-input>
-		</el-form-item>
+		</el-form-item> -->
 		<el-form-item>
-			<el-checkbox v-model="state.ruleForm.checked">
+			<el-checkbox v-model="state.ruleForm.checked" >
 				{{ $t('password.readAccept') }}
 			</el-checkbox>
 			<el-button link type="primary">
