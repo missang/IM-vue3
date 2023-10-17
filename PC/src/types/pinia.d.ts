@@ -3,6 +3,11 @@
  */
 
 // 用户信息
+declare interface CommonStore<T = any> {
+	networkStatus:boolean
+}
+
+// 用户信息
 declare interface UserInfosState<T = any> {
 	userInfos: {
 		authBtnList: string[];
@@ -10,9 +15,38 @@ declare interface UserInfosState<T = any> {
 		roles: string[];
 		time: number;
 		userName: string;
+		uid:number;
 		[key: string]: T;
+	},
+	loginUserOnlineStatus:string
+}
+
+
+// 联系人列表
+interface friendList {
+    [axis: string]: {
+		userStatus:string
+	},
+}
+interface groupList {
+    [axis: string]: {
+		groupname: string,
+		disabled: boolean,
+		groupid:number,
+		groupDetail:Object
+	},
+}
+declare interface Contacts<T = any> {
+	contacts: {
+		friendList: {
+			[axis: string]: friendList
+		},
+		groupList: groupList,
+		friendBlackList: Array
 	};
 }
+
+
 
 // 路由缓存列表
 declare interface KeepAliveNamesState {

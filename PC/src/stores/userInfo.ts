@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { Session } from '/@/utils/storage';
-import { getUserInfo, login, loginByMobile, loginBySocial, refreshTokenApi } from '/@/api/login/index';
+import { getUserInfo, login,logout, loginByMobile, loginBySocial, refreshTokenApi } from '/@/api/login/index';
 // import other from '/@/utils/other';
 import { useMessage } from '/@/hooks/message';
 
@@ -17,9 +17,11 @@ export const useUserInfo = defineStore('userInfo', {
 			userName: '',
 			photo: '',
 			time: 0,
+			uid:0,
 			roles: [],
 			authBtnList: [],
 		},
+		loginUserOnlineStatus:""
 	}),
 
 	actions: {
@@ -38,9 +40,25 @@ export const useUserInfo = defineStore('userInfo', {
 				login(data)
 					.then((res) => {
 						// 存储token 信息
-						console.log(res,8888)
 						Session.set('token', res.data.token);
 						Session.set('sso', res.data.sso);
+						resolve(res);
+					})
+					.catch((err) => {
+						useMessage().error(err?.msg || t('error.500'));
+						reject(err);
+					});
+			});
+		},
+		
+		async logout(data:any) {
+			return new Promise((resolve, reject) => {
+				logout({
+					logout_uid:this.userInfos.uid
+				})
+					.then((res) => {
+						Session.clear()
+						window.location.reload();
 						resolve(res);
 					})
 					.catch((err) => {
@@ -126,16 +144,47 @@ export const useUserInfo = defineStore('userInfo', {
 		 * @async
 		 */
 		async setUserInfos() {
-			getUserInfo().then((res) => {
-				console.log(res)
-				// const userInfo: any = {
-				// 	user: res.data.sysUser,
-				// 	time: new Date().getTime(),
-				// 	roles: res.data.roles,
-				// 	authBtnList: res.data.permissions,
-				// };
-				// this.userInfos = userInfo;
+			
+			return new Promise((resolve, reject) => {
+				
+				getUserInfo().then((res:any) => {
+					const userInfo: any = {
+						avatar: res.data.avatar,
+						invite_code:res.data.invite_code,
+						kf_id:res.data.kf_id,
+						nickname:res.data.nickname,
+						prompt_tone:res.data.prompt_tone,
+						third_url:res.data.third_url,
+						username:res.data.username,
+						uid:res.data.uid,
+						unread_friend_apply_count:res.data.unread_friend_apply_count
+					};
+					this.userInfos = userInfo;
+					resolve(res);
+				})
+				.catch((err) => {
+					useMessage().error(err.msg);
+					reject(err);
+				});
 			});
+
 		},
+        //修改登陆用户的用户属性
+        async updateMyUserInfo ( params:any) {
+			// 调用接口
+            const { data } = await {data:{}}
+            console.log('>>>>>>修改成功', data)
+			this.userInfos = Object.assign(this.userInfos, data)
+        },
+
+        //处理在线状态订阅变更（包含他人的用户状态）
+        handlePresenceChanges ( status:any){
+			this.loginUserOnlineStatus = status ? status : 'Unset'
+            // if (userId === this.userInfos.uid) {
+			// 	this.loginUserOnlineStatus = statusType ? statusType : 'Unset'
+            // } else {
+            //     console.log('>>>>>>不是自己的状态')
+            // }
+        },
 	},
 });

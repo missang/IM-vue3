@@ -34,8 +34,6 @@ export const router = createRouter({
 	routes: [...notFoundAndNoPower, ...staticRoutes,...baseRoutes],
 });
 
-console.log(222)
-
 /**
  * 路由多级嵌套数组处理成一维数组
  * @param arr 传入路由菜单数据数组
@@ -98,15 +96,13 @@ router.beforeEach(async (to, from, next) => {
 			Session.clear();
 			NProgress.done();
 		} else if (token && to.path === '/login') {
-			next('/home');
+			next('/');
 			NProgress.done();
 		} else {
 			const storesRoutesList = useRoutesList(pinia);
 			const { routesList } = storeToRefs(storesRoutesList);
-			console.log(routesList)
 			if (routesList.value.length === 0) {
 				// 后端控制路由：路由数据初始化，防止刷新时丢失
-				console.log(2222)
 				await initBackEndControlRoutes();
 				next({ path: to.path, query: to.query });
 			} else {

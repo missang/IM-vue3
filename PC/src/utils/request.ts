@@ -21,6 +21,7 @@ const service: AxiosInstance = axios.create({
  */
 service.interceptors.request.use(
 	(config: AxiosRequestConfig) => {
+		console.log(88888)
 		// 对get请求参数进行序列化
 		if (config.method === 'get') {
 			// @ts-ignore 使用qs库来序列化查询参数
@@ -32,7 +33,7 @@ service.interceptors.request.use(
 		// 统一增加Authorization请求头, skipToken 跳过增加token
 		const token = Session.getToken();
 		if (token) {
-			config.headers!['sso'] = token;
+			config.headers!['token'] = token;
 		}
 		const sso = Session.getSso();
 		
@@ -40,18 +41,19 @@ service.interceptors.request.use(
 			config.headers!['sso'] = sso;
 		}
 		// 统一增加TENANT-ID请求头
-		const tenantId = Session.getTenant();
-		if (tenantId) {
-			config.headers![CommonHeaderEnum.TENANT_ID] = tenantId;
-		}
+		// const tenantId = Session.getTenant();
+		// if (tenantId) {
+		// 	config.headers![CommonHeaderEnum.TENANT_ID] = tenantId;
+		// }
 
 		// 请求报文加密
-		if (config.headers![CommonHeaderEnum.ENC_FLAG]) {
-			const enc = other.encryption(JSON.stringify(config.data), import.meta.env.VITE_PWD_ENC_KEY);
-			config.data = {
-				encryption: enc,
-			};
-		}
+		// if (config.headers![CommonHeaderEnum.ENC_FLAG]) {
+		// 	const enc = other.encryption(JSON.stringify(config.data), import.meta.env.VITE_PWD_ENC_KEY);
+		// 	config.data = {
+		// 		encryption: enc,
+		// 	};
+		// }
+		config.headers!['X-Requested-With'] = 'XMLHttpRequest';
 		// JSON 字符串参数的格式转换
 		const params = new URLSearchParams()
 		for (const key in config.data) {
@@ -62,7 +64,6 @@ service.interceptors.request.use(
 		config.data = params
 		// 自动适配单体和微服务架构不同的URL
 		config.url = other.adaptationUrl(config.url);
-
 		// 处理完毕，返回config对象
 		return config;
 	},

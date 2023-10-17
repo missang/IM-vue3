@@ -1,6 +1,8 @@
 <template>
 	<el-config-provider :size="getGlobalComponentSize" :locale="getGlobalI18n">
 		<router-view />
+    <!-- 铃声标签 -->
+    <audio id="ring" :src="ring" controls hidden></audio>
 	</el-config-provider>
 </template>
 
@@ -13,6 +15,9 @@ import { Local, Session } from '/@/utils/storage';
 import { useChangeColor } from '/@/utils/theme';
 import mittBus from '/@/utils/mitt';
 import setIntroduction from '/@/utils/setIconfont';
+import { useUserInfo } from '/@/stores/userInfo';
+import { NextLoading } from '/@/utils/loading';
+import ring from '/@/assets/ring.mp3'
 
 // 定义变量内容
 const { messages, locale } = useI18n();
@@ -67,7 +72,7 @@ const setDispatchThemeConfig = () => {
 };
 // 页面加载时
 onMounted(() => {
-	nextTick(() => {
+	nextTick( async() => {
 		
 		setTimeout(() => {
 			// 默认样式
@@ -92,6 +97,13 @@ onMounted(() => {
 		if (Session.get('isTagsViewCurrenFull')) {
 			stores.setCurrenFullscreen(Session.get('isTagsViewCurrenFull'));
 		}
+			if (Session.getToken()){
+
+				NextLoading.start();
+					// 触发初始化用户信息 pinia
+				await useUserInfo().setUserInfos();
+				NextLoading.done();
+			};
 	});
 });
 // 页面销毁时，关闭监听布局配置/i18n监听

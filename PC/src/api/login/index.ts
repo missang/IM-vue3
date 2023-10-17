@@ -20,7 +20,6 @@ export const login = (data: any) => {
 	// 密码加密
 	// const encPassword = other.encryption(data.password, import.meta.env.VITE_PWD_ENC_KEY);
 	const { username, password, code, grant_type, scope } = data;
-	console.log({ username, password })
 	return request({
 		url: '/h5/login/check',
 		method: 'post',
@@ -31,6 +30,7 @@ export const login = (data: any) => {
 		},
 	});
 };
+
 
 export const loginByMobile = (mobile: any, code: any) => {
 	const grant_type = 'mobile';
@@ -147,9 +147,11 @@ export const getUserInfo = () => {
 	});
 };
 
-export const logout = () => {
+export const logout = (data:any) => {
+	const { logout_uid } = data;
 	return request({
-		url: '/auth/token/logout',
-		method: 'delete',
+		url: '/h5/login/logout',
+		method: 'post',
+		data: { logout_uid },
 	});
 };

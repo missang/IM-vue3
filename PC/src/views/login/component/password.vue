@@ -98,6 +98,7 @@ const onSignIn = async () => {
 	loading.value = true; // 正在登录中
 	try {
 		await useUserInfo().login(state.ruleForm); // 调用登录方法
+		await useUserInfo().setUserInfos();
 		emit('signInSuccess'); // 触发事件
 	} finally {
 		loading.value = false; // 登录结束

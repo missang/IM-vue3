@@ -61,10 +61,10 @@ const stores = useThemeConfig(pinia);
 const {themeConfig} = storeToRefs(stores);
 
 
-NextLoading.start();
 initialization()
 
 async function initialization() {
+    NextLoading.start();
     // await  getInitialize()
     const initApp = {
         app_log: "//immg.iloveclub.vip/upload/images/202310/096523e317fc45.png",

@@ -6,7 +6,6 @@
 		</div>
 		<div class="login-container">
 		<div class="tenant">
-			<!--  租户选择 -->
 			<tenant />
 		</div>
 			<div class="login-box">
@@ -43,15 +42,14 @@
 
 <script setup lang="ts" name="loginIndex">
 import { useThemeConfig } from '/@/stores/themeConfig';
-import { NextLoading } from '/@/utils/loading';
 import illustration from '/@/assets/login/login_bg.svg';
 import bg from '/@/assets/login/bg.png';
 import miniQr from '/@/assets/login/mini_qr.png';
 import { useI18n } from 'vue-i18n';
 import { formatAxis } from '/@/utils/formatTime';
 import { useMessage } from '/@/hooks/message';
-import { Session } from '/@/utils/storage';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
+import { NextLoading } from '/@/utils/loading';
 
 // 引入组件
 const Password = defineAsyncComponent(() => import('./component/password.vue'));
@@ -84,16 +82,14 @@ const signInSuccess = async () => {
 	
 		// 初始化登录成功时间问候语
 		let currentTimeInfo = formatAxis(new Date());
-		console.log(route.query?.redirect)
 		if (route.query?.redirect&& route.query?.redirect !=='/') {
 			router.push({
 				path: <string>route.query?.redirect,
 				query: Object.keys(<string>route.query?.params).length > 0 ? JSON.parse(<string>route.query?.params) : '',
 			});
 		} else {
-			router.push('/');
+			router.push('/chat');
 		}
-		console.log(222)
 		// 登录成功提示
 		const signInText = t('signInText');
 		useMessage().success(`${currentTimeInfo}，${signInText}`);

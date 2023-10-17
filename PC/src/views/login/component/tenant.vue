@@ -34,7 +34,6 @@ const { locale, t } = useI18n();
 		disabledI18n: string;
 		disabledSize: string;
 	}
-console.log(themeConfig.value.globalI18n)
 	const state = reactive<State>({
 		isScreenfull: false,
 		disabledI18n: themeConfig.value.globalI18n || 'zh-cn',

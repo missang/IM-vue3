@@ -108,13 +108,77 @@ export const notFoundAndNoPower = [
  * 所有节点都是挂载此节点下
  */
 export const baseRoutes: Array<RouteRecordRaw> = [
-	{
-		path: '/',
-		name: '/',
-		component: () => import('/@/views/home/index.vue'),
-		meta: {
-			isKeepAlive: true,
-		},
-		children: [],
-	},
+	// {
+	// 	path: '/',
+	// 	name: '/',
+	// 	component: () => import('/@/views/Chat/index.vue'),
+	// 	meta: {
+	// 		isKeepAlive: true,
+	// 	},
+	// 	children: [],
+	// },
+
+    /* 聊天页 */
+    {
+        path: '/chat',
+        name: 'Chat',
+        redirect: '/chat/conversation',
+        component: () => import('/@/views/Chat/index.vue'),
+        meta: {
+            title: '开始聊天',
+        },
+        children: [
+            /* 会话列表 */
+            {
+                path: 'conversation',
+                name: 'Conversation',
+                meta: {
+                    title: '会话',
+                    requiresAuth: true,
+                },
+                component: () => import('/@/views/Chat/components/Conversation/index.vue'),
+                children: [
+                    //系统通知详情框
+                    // {
+                    //     path: 'informdetails',
+                    //     component: () => import('/@/views/Chat/components/InformDetails'),
+                    // },
+                    // //聊天对话框
+                    // {
+                    //     path: 'message',
+                    //     component: () => import('/@/views/Chat/components/Message'),
+                    // },
+                ],
+            },
+            // /* 联系人页 */
+            {
+                path: 'contacts',
+                name: 'Contacts',
+                meta: {
+                    title: '联系页',
+                    requiresAuth: true,
+                },
+                component: () => import('/@/views/Chat/components/Contacts/index.vue'),
+                children: [
+                    // {
+                    //     path: 'message',
+
+                    //     component: () => import('/@/views/Chat/components/Message'),
+                    // },
+                    // //系统通知详情框
+                    // {
+                    //     path: 'informdetails',
+                    //     component: () => import('/@/views/Chat/components/InformDetails'),
+                    // },
+                    // {
+                    //     path: 'contactInfo',
+                    //     component: () =>
+                    //         import(
+                    //             '/@/views/Chat/components/Contacts/components/contactInfo.vue'
+                    //         ),
+                    // },
+                ],
+            },
+        ],
+    },
 ];
