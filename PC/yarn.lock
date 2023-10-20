@@ -975,6 +975,18 @@ balanced-match@^1.0.0:
   resolved "https://registry.npmmirror.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
+benz-amr-recorder@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.npmmirror.com/benz-amr-recorder/-/benz-amr-recorder-1.1.5.tgz#79fbb1f6e58a51619e5ac3ed1c7029247e93d8d4"
+  integrity sha512-NepctcNTsZHK8NxBb5uKO5p8S+xkbm+vD6GLSkCYdJeEsriexvgumLHpDkanX4QJBcLRMVtg16buWMs+gUPB3g==
+  dependencies:
+    benz-recorderjs "^1.0.5"
+
+benz-recorderjs@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmmirror.com/benz-recorderjs/-/benz-recorderjs-1.0.5.tgz#5cb2683413d3d5fcda8c44773ffaca161186619f"
+  integrity sha512-EwedOQo9KLti7HxDi/eZY51PSRbAXnOdEZmLvJ6ro3QQSoF9Y3AXBt57MIllGvVz5vtFYMeikG+GD7qTm3+p9w==
+
 big-integer@^1.6.17:
   version "1.6.51"
   resolved "https://registry.npmmirror.com/big-integer/-/big-integer-1.6.51.tgz#0df92a5d9880560d3ff2d5fd20245c889d130686"

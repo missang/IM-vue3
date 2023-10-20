@@ -39,16 +39,15 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { useStore } from 'vuex'
-import messageType from '@/constant/messageType'
-import useGetUserMapInfo from '@/hooks/useGetUserMapInfo'
-const { getTheGroupNickNameById, getLoginNickNameById } = useGetUserMapInfo()
+import messageType from '/@/constant/messageType'
+import useGetUserMapInfo from '/@/hooks/useGetUserMapInfo'
+const { getTheGroupusernameById, getLoginusernameById } = useGetUserMapInfo()
 const { ALL_MESSAGE_TYPE, SESSION_MESSAGE_TYPE, CHAT_TYPE } = messageType
 /* stores */
-const store = useStore()
-console.log(store.state)
+import { useUserInfo } from '/@/stores/userInfo';
+const userInfoStore = useUserInfo()
 const loginUserInfo = computed(() => {
-    return store.state.loginUserInfo
+    return userInfoStore.userInfos
 })
 //是否开启引用展示框
 const isShowQuoteMsgBox = ref(false)
@@ -69,13 +68,13 @@ const extractMessageBodyValue = (sourceMsg) => {
     const { type, msg: msgContent, id: mid, from } = sourceMsg
     msgQuote.msgID = mid
     msgQuote.msgType = type
-    if (from === loginUserInfo.value.hxId) {
-        msgQuote.msgSender = getLoginNickNameById()
+    if (from === loginUserInfo.value.uid) {
+        msgQuote.msgSender = getLoginusernameById()
     } else {
         //判断消息引用来源是否为群组，如果是群组，则从群组中获取群组属性。
         const groupId =
             sourceMsg.chatType === CHAT_TYPE.GROUP ? sourceMsg.to : ''
-        msgQuote.msgSender = getTheGroupNickNameById(groupId, from)
+        msgQuote.msgSender = getTheGroupusernameById(groupId, from)
     }
     if (type === ALL_MESSAGE_TYPE.IMAGE) {
         quoteImageUrl.thumb = sourceMsg.thumb

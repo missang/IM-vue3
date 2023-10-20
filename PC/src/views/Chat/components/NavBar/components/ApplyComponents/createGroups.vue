@@ -4,7 +4,7 @@ const contactsStore = uesContacts()
 import _ from 'lodash'
 import { ElNotification } from 'element-plus'
 import { handleSDKErrorNotifi } from '/@/utils/handleSomeData'
-// import { EaseChatClient } from '@/IM/initwebsdk'
+
 import { messageType } from '/@/constant'
 import {
     Search,
@@ -26,7 +26,7 @@ const props = defineProps({
 const { dialogVisible } = toRefs(props)
 
 const nextStep = ref(0) //下一步
-const renderFriendList = ref([])
+const renderFriendList:any = ref([])
 //选中人数统计
 const checkedCount = computed(() => {
     return _.sumBy(renderFriendList.value, 'isChecked') * 1
@@ -34,7 +34,7 @@ const checkedCount = computed(() => {
 //选中人id数组
 const checkedUserArr = computed(() => {
     const filtered = _.filter(renderFriendList.value, 'isChecked') //过滤后为选中的user list
-    return _.map(filtered, 'hxId')
+    return _.map(filtered, 'uid')
 })
 onMounted(() => {
     handleRenderFiendList()
@@ -47,7 +47,7 @@ const handleRenderFiendList = () => {
     for (const key in friendList.value) {
         if (Object.hasOwnProperty.call(friendList.value, key)) {
             const v = friendList.value[key]
-            newFriendList.push({ name: v.nickname && v.nickname ? v.nickname : v.hxId, hxId: v.hxId, isChecked: false, keywords: `${v.hxId && v.hxId}${v.nickname && v.nickname}` })
+            newFriendList.push({ name: v.username && v.username ? v.username : v.uid, uid: v.uid, isChecked: false, keywords: `${v.uid && v.uid}${v.username && v.username}` })
         }
     }
     return renderFriendList.value = newFriendList
@@ -56,7 +56,7 @@ const handleRenderFiendList = () => {
 //创建用户搜索部分
 const serachInputValue = ref('')
 const isShowSearchContent = ref(false) //控制检索内容显隐
-const searchResultList = ref([])
+const searchResultList:any = ref([])
 const searchFriend = () => {
     console.log('>>>>>serachInputValue.value ', serachInputValue.value === '')
     if (serachInputValue.value) {
@@ -74,7 +74,7 @@ const searchFriend = () => {
 
 /* 创建群组form */
 //创建群组群组所用参数
-const groupCreateForm = reactive({
+const groupCreateForm:any = reactive({
     groupname: '',
     desc: '',
     members: [],
@@ -161,7 +161,7 @@ defineExpose({ handleRenderFiendList })
                         <div class="friend_user_list">
                             <div class="friend_user_list_left">
                                 <el-avatar :src="defaultAvatar"></el-avatar>
-                                <b class="friend_list_username">{{ `${item.name}(${item.hxId})` }}</b>
+                                <b class="friend_list_username">{{ `${item.name}(${item.uid})` }}</b>
                             </div>
                             <el-icon class="checked_btn"
                                 @click="searchResultList[index].isChecked = !searchResultList[index].isChecked">
@@ -179,7 +179,7 @@ defineExpose({ handleRenderFiendList })
                         <div class="friend_user_list">
                             <div class="friend_user_list_left">
                                 <el-avatar :src="defaultAvatar"></el-avatar>
-                                <b class="friend_list_username">{{ `${item.name}(${item.hxId})` }}</b>
+                                <b class="friend_list_username">{{ `${item.name}(${item.uid})` }}</b>
                             </div>
                             <el-icon class="checked_btn"
                                 @click="renderFriendList[index].isChecked = !renderFriendList[index].isChecked">

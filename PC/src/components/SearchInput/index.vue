@@ -33,7 +33,12 @@ onClickOutside(searchBox, () => (isShowResultContent.value = false))
 const searchSuggest = ref({})
 //搜索相匹配的值
 const querySearch = () => {
-    console.log('>>>>>>>>触发搜索')
+    console.log('>>>>>>>>触发搜索',inputValue.value)
+    if(!inputValue.value){
+      isShowResultContent.value = false
+    }else{
+      isShowResultContent.value = true
+    }
     if (inputValue.value) {
     //搜索会话 conversation
     //todo 后续计划在会话数据结构中加keywords字段 通过keywords字段实现更多条件的搜索
@@ -53,10 +58,14 @@ const querySearch = () => {
         //搜索联系人 contacts
         if (props.searchType === 'contacts') {
             const resObj = {}
-            const resultList = _.filter(props.searchData, (o) => o.hxId && o.hxId.includes(inputValue.value) || (o.nickname && o.nickname.includes(inputValue.value)) || (o.groupid && o.groupid.includes(inputValue.value)) || (o.groupname && o.groupname.includes(inputValue.value)))
-            console.log('>>>>>>搜索给出结果', resultList)
+            console.log(props.searchData,inputValue.value)
+            console.log(props.searchData[1].username,props.searchData[1].username.includes(inputValue.value))
+            const resultList = _.filter(props.searchData, (o) =>{
+              return o.uid && o.uid.toString().includes(inputValue.value) || (o.username && o.username.includes(inputValue.value)) || (o.groupid && o.groupid.includes(inputValue.value)) || (o.groupname && o.groupname.includes(inputValue.value))
+            } )
+            // console.log('>>>>>>搜索给出结果', resultList)
             resultList.length > 0 && resultList.forEach(item => {
-                const key = item.hxId ? CHAT_TYPE.SINGLE : CHAT_TYPE.GROUP
+                const key = item.uid ? CHAT_TYPE.SINGLE : CHAT_TYPE.GROUP
                 if (resObj[key]) {
                     resObj[key].push(item)
                 } else {
@@ -128,8 +137,8 @@ const emitConversation = (fromType, item) => {
 //选中通知联系人跳转 联系人搜索暂不写入本地存储
 const emitContacts = (item) => {
     console.log('>>>>>>联系人触发', item)
-    if (item.hxId) {
-        emit('toContacts', { id: item.hxId, chatType: CHAT_TYPE.SINGLE })
+    if (item.uid) {
+        emit('toContacts', { id: item.uid, chatType: CHAT_TYPE.SINGLE })
     }
     if (item.groupid) {
         emit('toContacts', { id: item.groupid, chatType: CHAT_TYPE.GROUP })
@@ -140,8 +149,11 @@ const emitContacts = (item) => {
 <template>
   <div class="search_box" ref="searchBox">
     <div>
-      <el-input v-model.trim="inputValue" placeholder="搜索" @focus="isShowResultContent = true"
-        @clear="isShowResultContent = false" @input="querySearch" :prefix-icon="Search" clearable />
+
+      <!-- <el-input v-model.trim="inputValue" placeholder="搜索" @focus="isShowResultContent = true"
+        @clear="isShowResultContent = false" @input="querySearch" :prefix-icon="Search" clearable /> -->
+      <el-input v-model.trim="inputValue" placeholder="搜索"
+         @input="querySearch" :prefix-icon="Search" clearable />
     </div>
 
     <div v-if="isShowResultContent" ref="resultContent" class="resultContent">
@@ -221,12 +233,12 @@ const emitContacts = (item) => {
                 <div class="item_body item_left">
                   <div class="session_other_avatar">
                     <el-avatar
-                      :src="item.hxId && item.avatarurl ? item.avatarurl : item.groupid ? '/@/assets/avatar/jiaqun2x.png' : '/@/assets/avatar/theme2x.png'">
+                      :src="item.uid && item.avatar ? item.avatar : item.groupid ? '/@/assets/avatar/jiaqun2x.png' : '/@/assets/avatar/theme2x.png'">
                     </el-avatar>
                   </div>
                 </div>
                 <div class="item_body item_main">
-                  <div class="name">{{ item.nickname ? item.nickname : item.groupname ? item.groupname : item.hxId }}
+                  <div class="name">{{ item.username ? item.username : item.groupname ? item.groupname : item.uid }}
                   </div>
                 </div>
               </div>
@@ -241,12 +253,12 @@ const emitContacts = (item) => {
                 <div class="item_body item_left">
                   <div class="session_other_avatar">
                     <el-avatar
-                      :src="item.hxId && item.avatarurl ? item.avatarurl : item.groupid ? '/@/assets/avatar/jiaqun2x.png' : '/@/assets/avatar/theme2x.png'">
+                      :src="item.uid && item.avatar ? item.avatar : item.groupid ? '/@/assets/avatar/jiaqun2x.png' : '/@/assets/avatar/theme2x.png'">
                     </el-avatar>
                   </div>
                 </div>
                 <div class="item_body item_main">
-                  <div class="name">{{ item.nickname ? item.nickname : item.groupname ? item.groupname : item.hxId }}
+                  <div class="name">{{ item.username ? item.username : item.groupname ? item.groupname : item.uid }}
                   </div>
                 </div>
               </div>

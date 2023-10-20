@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-// import { EaseChatClient } from '@/IM/initwebsdk'
+
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { messageType } from '/@/constant'
 /* route */
-import { useRoute } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 /* 组件 */
 // import UserStatus from '@/components/UserStatus'
 /* 单人头像 */
@@ -113,8 +114,8 @@ const toChatMessage = () => {
                             class="avatar_img"
                             v-if="$route.query.chatType === CHAT_TYPE.SINGLE"
                             :src="
-                                nowContactInfo.avatarurl
-                                    ? nowContactInfo.avatarurl
+                                nowContactInfo.avatar
+                                    ? nowContactInfo.avatar
                                     : defaultSingleAvatar
                             "
                         >
@@ -130,9 +131,9 @@ const toChatMessage = () => {
                     <div class="name">
                         <p v-if="$route.query.chatType === CHAT_TYPE.SINGLE">
                             {{
-                                nowContactInfo.nickname
-                                    ? `${nowContactInfo.nickname}(${nowContactInfo.hxId})`
-                                    : nowContactInfo.hxId
+                                nowContactInfo.username
+                                    ? `${nowContactInfo.username}(${nowContactInfo.uid})`
+                                    : nowContactInfo.uid
                             }}
                         </p>
                         <p v-if="$route.query.chatType === CHAT_TYPE.GROUP">
@@ -236,11 +237,16 @@ const toChatMessage = () => {
                 flex-direction: column;
                 justify-content: flex-start;
                 align-items: center;
-
-                .avatar > .avatar_img {
-                    width: 80px;
-                    height: 80px;
-                }
+                    text-align:center;
+                    .avatar{
+                    width: 120px;
+                    height: 120px;
+                        .avatar_img {
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+                // .avatar > 
 
                 .name {
                     margin-top: 15px;

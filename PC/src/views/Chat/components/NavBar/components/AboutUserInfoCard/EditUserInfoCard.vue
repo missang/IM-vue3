@@ -27,7 +27,7 @@ const SEX_TEXT = {
 const isEdit = ref(false)
 const dialogVisible = ref(false)
 const userInfos = ref({
-    nickname: '',
+    username: '',
     avatarurl: '',
     mail: '123@qq.com',
     phone: '16888888888',
@@ -106,12 +106,12 @@ defineExpose({
                     <div class="infor_content_header">
 
                         <el-avatar class="infor_avatar" :size="60"
-                            :src="userInfos.avatarurl ? userInfos.avatarurl : defaultAvatar" fit="fit">
+                            :src="userInfos.avatar ? userInfos.avatar : defaultAvatar" fit="fit">
                         </el-avatar>
                         <div class="infor_content_header_r">
 
                             <div class="infor_name">
-                                <span>{{ userInfos.nickname || '暂无昵称' }}</span>
+                                <span>{{ userInfos.username || '暂无昵称' }}</span>
                                 <span class="infor_sex" v-if="genderIcon[userInfos.gender]">
                                     <img :src="genderIcon[userInfos.gender]" />
                                 </span>
@@ -131,9 +131,9 @@ defineExpose({
                     <div class="infor_content_main">
                         <div class="infor_content_main_item">
                             <span class="label">姓名</span>
-                            <span class="content" v-if="!isEdit">{{ userInfos.nickname || '暂无昵称' }}</span>
+                            <span class="content" v-if="!isEdit">{{ userInfos.username || '暂无昵称' }}</span>
                             <span class="content" v-else>
-                                <el-input class="input_style" v-model="userInfos.nickname" placeholder="请输入您的昵称~"
+                                <el-input class="input_style" v-model="userInfos.username" placeholder="请输入您的昵称~"
                                     :maxlength="10" show-word-limit clearable size="small" :prefix-icon="EditPen" />
                             </span>
                         </div>

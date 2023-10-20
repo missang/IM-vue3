@@ -62,9 +62,6 @@ export function refreshCache() {
 export function info() {
 	return axios.get(import.meta.env.VITE_API_URL + '/h5/pop/get');
 }
-export function getInitialize() {
-	return axios.get(import.meta.env.VITE_API_URL + '/h5/pop/get');
-}
 
 
 

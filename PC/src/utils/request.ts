@@ -21,7 +21,6 @@ const service: AxiosInstance = axios.create({
  */
 service.interceptors.request.use(
 	(config: AxiosRequestConfig) => {
-		console.log(88888)
 		// 对get请求参数进行序列化
 		if (config.method === 'get') {
 			// @ts-ignore 使用qs库来序列化查询参数
@@ -31,14 +30,17 @@ service.interceptors.request.use(
 		}
 
 		// 统一增加Authorization请求头, skipToken 跳过增加token
-		const token = Session.getToken();
-		if (token) {
-			config.headers!['token'] = token;
-		}
-		const sso = Session.getSso();
-		
-		if (sso) {
-			config.headers!['sso'] = sso;
+		if(!config.headers?.skipToken){
+			
+			const token = Session.getToken();
+			if (token) {
+				config.headers!['token'] = token;
+			}
+			const sso = Session.getSso();
+			
+			if (sso) {
+				config.headers!['sso'] = sso;
+			}
 		}
 		// 统一增加TENANT-ID请求头
 		// const tenantId = Session.getTenant();
@@ -79,7 +81,7 @@ service.interceptors.request.use(
  * @returns 如果响应成功，则返回响应的data属性；否则，抛出错误或者执行其他操作
  */
 const handleResponse = (response: AxiosResponse<any>) => {
-	if (response.data.code === 1) {
+	if (response.data.code !== 0) {
 		throw response.data;
 	}
 

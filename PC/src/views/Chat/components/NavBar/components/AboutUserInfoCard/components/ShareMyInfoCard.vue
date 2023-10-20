@@ -31,9 +31,9 @@ const sortedFriendList = computed(() => {
     for (const key in sourceData) {
         if (Object.hasOwnProperty.call(sourceData, key)) {
             const v = sourceData[key]
-            v.name = v.nickname ? v.nickname : v.hxId
+            v.name = v.username ? v.username : v.uid
             v.isChecked = false
-            v.keywords = `${v.hxId && v.hxId}${v.nickname && v.nickname || ''}`
+            v.keywords = `${v.uid && v.uid}${v.username && v.username || ''}`
         }
     }
     return sourceData
@@ -48,11 +48,11 @@ const handleAddFriendToSendList = (item) => {
         })
         return
     }
-    if (item.isChecked && checkedTobeSendFriend.value.includes(item.hxId)) {
-        checkedTobeSendFriend.value.map((m, idx) => { if (m === item.hxId) { checkedTobeSendFriend.value.splice(idx, 1) } })
+    if (item.isChecked && checkedTobeSendFriend.value.includes(item.uid)) {
+        checkedTobeSendFriend.value.map((m, idx) => { if (m === item.uid) { checkedTobeSendFriend.value.splice(idx, 1) } })
         item.isChecked = false
     } else {
-        if (!checkedTobeSendFriend.value.includes(item.hxId)) checkedTobeSendFriend.value.push(item.hxId)
+        if (!checkedTobeSendFriend.value.includes(item.uid)) checkedTobeSendFriend.value.push(item.uid)
         item.isChecked = true
     }
 }
@@ -62,7 +62,7 @@ const delFriendFromCheckedList = (item, index) => {
     for (const key in renderFriend.value) {
         if (Object.hasOwnProperty.call(renderFriend.value, key)) {
             const m = renderFriend.value[key]
-            if (m.hxId === item) return m.isChecked = false
+            if (m.uid === item) return m.isChecked = false
         }
     }
 }
@@ -109,14 +109,14 @@ const startSendMyUserCard = () => {
         sendTask.push(userId)
         const infoParams = _.clone(loginUserInfo.value)
         //这一步是因为其他端统一用的avatar 作为头像路径的展示
-        infoParams.avatar = infoParams.avatarurl
+        infoParams.avatar = infoParams.avatar
         console.log('infoParams', infoParams)
         const msgOptions = {
             id: userId,
             chatType: CHAT_TYPE.SINGLE,
             customEvent: 'userCard',
             customExts: {
-                uid: loginUserInfo.value.hxId,
+                uid: loginUserInfo.value.uid,
                 ...loginUserInfo.value
             }
         }
@@ -143,7 +143,7 @@ defineExpose({
                             <div class="friend_user_list">
                                 <div class="friend_user_list_left">
                                     <el-avatar :src="defaultAvatar"></el-avatar>
-                                    <b class="friend_list_username">{{`${item.name}(${item.hxId})` }}</b>
+                                    <b class="friend_list_username">{{`${item.name}(${item.uid})` }}</b>
                                 </div>
                                 <el-icon class="checked_btn">
                                     <div @click="handleAddFriendToSendList(item)">
@@ -167,7 +167,7 @@ defineExpose({
                                         <div class="friend_user_list">
                                             <div class="friend_user_list_left">
                                                 <el-avatar :src="defaultAvatar"></el-avatar>
-                                                <b class="friend_list_username">{{ `${item.name}(${item.hxId})` }}</b>
+                                                <b class="friend_list_username">{{ `${item.name}(${item.uid})` }}</b>
                                             </div>
                                             <el-icon class="checked_btn">
                                                 <div @click="handleAddFriendToSendList(item)">

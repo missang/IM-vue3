@@ -1,6 +1,6 @@
 /* 构建inform通知 */
 import { informType } from '/@/constant'
-// import { EaseChatClient } from '@/IM/initwebsdk'
+
 const { INFORM_FROM, INFORM_TYPE } = informType
 export default function (fromType, informContnet) {
     const { type, from, to, status } = informContnet

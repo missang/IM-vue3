@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import { EaseChatClient } from '@/IM/initwebsdk'
+
 import { ElNotification } from 'element-plus'
 import { handleSDKErrorNotifi } from '/@/utils/handleSomeData'
 const props = defineProps({

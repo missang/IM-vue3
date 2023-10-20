@@ -83,14 +83,14 @@ const informDetail = computed(() => {
               <el-empty description="暂无联系人..." />
             </template>
           </el-collapse-item>
-          <el-collapse-item :title="`群聊 ( ${Object.keys(joinedGroupList).length} )`">
+          <!-- <el-collapse-item :title="`群聊 ( ${Object.keys(joinedGroupList).length} )`">
             <template v-if="Object.keys(joinedGroupList).length > 0">
               <GroupItem @toContacts="toContacts" />
             </template>
             <template v-else>
               <el-empty description="暂无加入的群组..." />
             </template>
-          </el-collapse-item>
+          </el-collapse-item> -->
         </el-collapse>
       </el-scrollbar>
     </el-aside>

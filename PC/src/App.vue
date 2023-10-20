@@ -16,7 +16,9 @@ import { useChangeColor } from '/@/utils/theme';
 import mittBus from '/@/utils/mitt';
 import setIntroduction from '/@/utils/setIconfont';
 import { useUserInfo } from '/@/stores/userInfo';
+import { uesContacts } from '/@/stores/contacts';
 import { NextLoading } from '/@/utils/loading';
+import {  ElMessage } from 'element-plus';
 import ring from '/@/assets/ring.mp3'
 
 // 定义变量内容
@@ -53,10 +55,8 @@ const getThemeConfig = computed(() => {
 const onColorPickerChange = () => {
 	if (!getThemeConfig.value.primary) return ElMessage.warning('全局主题 primary 颜色值不能为空');
 	// 颜色加深
-	console.log(getThemeConfig.value.primary,document.documentElement.style)
 	document.documentElement.style.setProperty('--el-color-primary-dark-2', `${getDarkColor(getThemeConfig.value.primary, 0.1)}`);
 	document.documentElement.style.setProperty('--el-color-primary', getThemeConfig.value.primary);
-	console.log(document.documentElement.style)
 	// 颜色变浅
 	for (let i = 1; i <= 9; i++) {
 		document.documentElement.style.setProperty(`--el-color-primary-light-${i}`, `${getLightColor(getThemeConfig.value.primary, i / 10)}`);
@@ -71,8 +71,16 @@ const setDispatchThemeConfig = () => {
 	Local.set('themeConfigStyle', document.documentElement.style.cssText);
 };
 // 页面加载时
-onMounted(() => {
-	nextTick( async() => {
+onMounted(async() => {
+		if (Session.getToken()){
+console.log(99999)
+			NextLoading.start();
+				// 触发初始化用户信息 pinia
+			await useUserInfo().setUserInfos();
+			await uesContacts().getBaseChat()
+			NextLoading.done();
+		};
+	nextTick( () => {
 		
 		setTimeout(() => {
 			// 默认样式
@@ -97,13 +105,6 @@ onMounted(() => {
 		if (Session.get('isTagsViewCurrenFull')) {
 			stores.setCurrenFullscreen(Session.get('isTagsViewCurrenFull'));
 		}
-			if (Session.getToken()){
-
-				NextLoading.start();
-					// 触发初始化用户信息 pinia
-				await useUserInfo().setUserInfos();
-				NextLoading.done();
-			};
 	});
 });
 // 页面销毁时，关闭监听布局配置/i18n监听

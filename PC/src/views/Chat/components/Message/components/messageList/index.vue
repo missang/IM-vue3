@@ -1,22 +1,25 @@
-<script setup>
-import { reactive, ref, computed, toRefs, nextTick } from 'vue'
-import { useStore } from 'vuex'
+<script setup lang="ts">
 import { useClipboard, usePermission } from '@vueuse/core'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import BenzAMRRecorder from 'benz-amr-recorder'
-import fileSizeFormat from '@/utils/fileSizeFormat'
-import dateFormat from '@/utils/dateFormater'
+import fileSizeFormat from '/@/utils/fileSizeFormat'
+import dateFormat from '/@/utils/dateFormater'
 import { messageType } from '/@/constant'
-import { handleSDKErrorNotifi } from '@/utils/handleSomeData'
+import { handleSDKErrorNotifi } from '/@/utils/handleSomeData'
 /* utils */
-import paseLink from '@/utils/paseLink'
+import paseLink from '/@/utils/paseLink'
 /* 默认头像 */
-import defaultAvatar from '@/assets/images/avatar/theme2x.png'
+import defaultAvatar from '/@/assets/images/avatar/theme2x.png'
 import ReportMessage from '../suit/reportMessage.vue'
 /* components */
 import ModifyMessage from '../suit/modifyMessage.vue'
 /* vuex store */
-const store = useStore()
+import { uesContacts } from '/@/stores/contacts';
+import { useGroups } from '/@/stores/goups';
+import { useUserInfo } from '/@/stores/userInfo';
+const contactsStore = uesContacts()
+const userInfoStore = useUserInfo()
+const groupsStore = useGroups()
 /* props */
 const props = defineProps({
     messageData: {
@@ -36,7 +39,7 @@ const { messageData } = toRefs(props)
 /* constant */
 const { ALL_MESSAGE_TYPE, CUSTOM_TYPE, CHAT_TYPE, CHANGE_MESSAGE_BODAY_TYPE } =
     messageType
-/* login hxId */
+/* login uid */
 const loginUserId = 1
 
 /* computed-- 消息来源是否为自己 */
@@ -52,31 +55,31 @@ const isLink = computed(() => {
     }
 })
 /* 获取自己的用户信息 */
-const loginUserInfo = computed(() => store.state.loginUserInfo)
+const loginUserInfo = computed(() => userInfoStore.userInfos)
 
 /* 获取他人的用户信息 */
 const otherUserInfo = computed(() => {
     return (otherId) => {
-        const otherInfos = store.state.Contacts.friendList[otherId] || {
+        const otherInfos = contactsStore.contacts.friendList[otherId] || {
             avatarurl: defaultAvatar
         }
         return otherInfos
     }
 })
 //处理聊天对方昵称展示
-const handleNickName = computed(() => {
+const handleusername = computed(() => {
     const { chatType, id } = nowPickInfo.value
-    const friendList = store.state.Contacts.friendList
-    const groupsInfos = store.state.Groups.groupsInfos
-    return (hxId) => {
+    const friendList = contactsStore.contacts.friendList
+    const groupsInfos = groupsStore.groupsInfos
+    return (uid) => {
         if (chatType === CHAT_TYPE.SINGLE) {
-            return friendList[hxId]?.nickname || hxId
+            return friendList[uid]?.username || uid
         }
         if (chatType === CHAT_TYPE.GROUP) {
-            const userInfoFromGroupNickname =
-                groupsInfos[id]?.groupMemberInfo?.[hxId]?.nickName
-            const friendUserInfoNickname = friendList[hxId]?.nickname
-            return userInfoFromGroupNickname || friendUserInfoNickname || hxId
+            const userInfoFromGroupusername =
+                groupsInfos[id]?.groupMemberInfo?.[uid]?.username
+            const friendUserInfousername = friendList[uid]?.username
+            return userInfoFromGroupusername || friendUserInfousername || uid
         }
     }
 })
@@ -172,7 +175,7 @@ const recallMessage = async ({ id, to, chatType }) => {
         chatType: chatType
     }
     try {
-        await store.dispatch('recallMessage', options)
+        // await store.dispatch('recallMessage', options)
     } catch (error) {
         handleSDKErrorNotifi(error.type, error.message)
         console.log('>>>>>>撤回失败', error)
@@ -263,8 +266,8 @@ const onMsgQuote = (msg) => emit('messageQuote', msg)
                 <div class="message_box_card">
                     <span
                         v-show="!isMyself(msgBody)"
-                        class="message_box_nickname"
-                        >{{ handleNickName(msgBody.from) }}</span
+                        class="message_box_username"
+                        >{{ handleusername(msgBody.from) }}</span
                     >
                     <el-dropdown
                         class="message_box_content"
@@ -385,9 +388,9 @@ const onMsgQuote = (msg) => emit('messageQuote', msg)
                                             fit="cover"
                                         />
                                         <!-- 昵称 -->
-                                        <span class="nickname">{{
+                                        <span class="username">{{
                                             (msgBody.customExts &&
-                                                msgBody.customExts.nickname) ||
+                                                msgBody.customExts.username) ||
                                             msgBody.customExts.uid
                                         }}</span>
                                     </div>

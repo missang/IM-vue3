@@ -28,9 +28,9 @@ const showShareInfoModal = () => {
     <div class="info_fist_col">
       <el-avatar class="avatar" :size="56" :src="userInfos.avatar" />
       <div class="name_box">
-        <span class="nickname">{{
-        userInfos.nickname
-        ? userInfos.nickname
+        <span class="username">{{
+        userInfos.username
+        ? userInfos.username
         : loginUserId
         }}</span>
         <img v-if="userInfos.gender && genderIcon[userInfos.gender]" class="gender"
@@ -122,7 +122,7 @@ const showShareInfoModal = () => {
       justify-content: flex-start;
       align-items: center;
 
-      .nickname {
+      .username {
         max-width: 130px;
         margin-top: 3px;
         display: inline-block;

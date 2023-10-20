@@ -26,12 +26,10 @@
 
 <script setup>
 import { ref, reactive, nextTick } from 'vue'
-import { useStore } from 'vuex'
 import { messageType } from '/@/constant'
 import { ElMessage } from 'element-plus'
 import { Check, Close } from '@element-plus/icons-vue'
 const { CHAT_TYPE } = messageType
-const store = useStore()
 const dialogVisible = ref(false)
 const editMessageContent = reactive({
     msg: '',
@@ -46,7 +44,7 @@ const saveEditedMessage = async () => {
         ElMessage.warning('消息内容不能为空')
     }
     try {
-        await store.dispatch('modifyMessage', { ...editMessageContent })
+        // await store.dispatch('modifyMessage', { ...editMessageContent })
     } catch (error) {
         if (error?.type === 50) {
             ElMessage({

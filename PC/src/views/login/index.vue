@@ -61,7 +61,6 @@ const Tenant = defineAsyncComponent(() => import('./component/tenant.vue'));
 // 定义变量内容
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
-console.log(themeConfig.value,999)
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();

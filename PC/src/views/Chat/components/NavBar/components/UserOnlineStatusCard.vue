@@ -4,7 +4,6 @@ import { useUserInfo } from '/@/stores/userInfo';
 const stores = useUserInfo();
 import { onLineStatus } from '/@/constant'
 import { ElNotification } from 'element-plus'
-// import { EaseChatClient } from '/@/IM/initwebsdk'
 
 const loginUserOnlineStatus = computed(() => stores.loginUserOnlineStatus)
 

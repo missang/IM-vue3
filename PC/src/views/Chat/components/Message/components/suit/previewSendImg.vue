@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import fileSizeFormat from '@/utils/fileSizeFormat'
+import fileSizeFormat from '/@/utils/fileSizeFormat'
 const emits = defineEmits(['sendImagesMessage'])
 let fileObj = null
 const imgPaths = ref('')

@@ -13,9 +13,9 @@ import { ElementIcons,  UploadExcel, UploadFile, UploadImg, Editor } from '/@/co
 
 import 'amfe-flexible'
 import '/@/styles/index.scss'
+import '/@/styles/iconfont/iconfont.css'
 
-console.log(router)
-const app = createApp(App)
+export const app = createApp(App)
 
 // 导入通用自定义组件
 app.component('uploadExcel', UploadExcel);
@@ -31,3 +31,5 @@ app
     .use(i18n) // 国际化
     .use(hljsVuePlugin) // 代码高亮
   .use(router).mount('#app');
+
+export default app;

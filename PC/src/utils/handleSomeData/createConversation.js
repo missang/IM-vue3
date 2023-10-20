@@ -1,8 +1,9 @@
 /* 会话列表总装车间 */
 import _ from 'lodash'
 // import store from '@/store'
+import { uesContacts } from '/@/stores/contacts';
 import { messageType } from '/@/constant'
-// import { EaseChatClient } from '@/IM/initwebsdk'
+
 
 import defaultGroupAvatarUrl from '/@/assets/avatar/jiaqun2x.png'
 import defaultSingleAvatarUrl from '/@/assets/avatar/theme2x.png'
@@ -81,6 +82,7 @@ const handleCalcUnReadNum = (msgBody, toDoUpdateConversation) => {
     return currentUnreadNum + 1
 }
 export default function (corresMessage) {
+    const contactsStore = uesContacts()
     /*
      * 1、取到messageList更新后的最后一套消息
      * 2、取会话列表数据进行与当前的messageList进行比对查看messaList中的Key是否已经存在于已有的Conversation中。
@@ -99,16 +101,16 @@ export default function (corresMessage) {
         }
         //存在则更新
         else if (localConversationList && localConversationList[listKey]) {
-            // const theData = _.cloneDeep(
-            //     store.state.Conversation.conversationListData[listKey]
-            // )
-            // const updatedCoversation = buildConversationItem(
-            //     'update',
-            //     msgBody,
-            //     theData
-            // )
+            const theData = _.cloneDeep(
+                contactsStore.contacts.conversationListData[listKey]
+            )
+            const updatedCoversation = buildConversationItem(
+                'update',
+                msgBody,
+                theData
+            )
 
-            // updatedConversation[listKey] = updatedCoversation
+            updatedConversation[listKey] = updatedCoversation
         }
     }
     //构建会话方法

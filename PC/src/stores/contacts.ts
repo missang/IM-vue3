@@ -4,6 +4,7 @@ import { Session } from '/@/utils/storage';
 // import other from '/@/utils/other';
 import { useMessage } from '/@/hooks/message';
 import { sortPinyinFriendItem, handlePresence } from '/@/utils/handleSomeData'
+import { baseChat,getFriendList } from '/@/api/chat';
 import _ from 'lodash'
 
 import { i18n } from '/@/i18n';
@@ -18,11 +19,26 @@ export const uesContacts = defineStore('contacts', {
 		contacts: {
             friendList: {},
             groupList: {},
-            friendBlackList: []
+            friendBlackList: [],
+            conversationListData:[]
 		},
 	}),
-
 	actions: {
+        
+        async getBaseChat(){
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const result = await baseChat();
+                    console.log(result)
+                    await this.fetchAllFriendListFromServer()
+                    resolve(true)
+                } catch (error) {
+                    reject(error)
+                }
+            })
+        },
+
+        
         //获取群组列表
         async fetchGroupList( params:any) {
             // 调用接口或者去stores拿数据
@@ -83,16 +99,21 @@ export const uesContacts = defineStore('contacts', {
          * @param payload 接口获取联系人列表
          * @returns 
          */
-        async fetchAllFriendListFromServer(payload:any) {
+        async fetchAllFriendListFromServer() {
 
-            const friendListData:any = {}
-            const { data } ={data:[]}
-            try {
-                //获取好友列表 接口获取
-                data.length > 0 &&
-                    data.map((item) => (friendListData[item] = { hxId: item }))
-                //获取好友列表对应的用户属性
-                const friendListWithInfos = await this.getOtherUserInfo(data)
+            return new Promise(async (resolve, reject) => {
+                let friendListData:any = {}
+                const { data } = await getFriendList()
+                for (const key in data) {
+                    if (Object.prototype.hasOwnProperty.call(data, key)) {
+                        const element = data[key];
+                        for (const keys in element) {
+                            const elements = element[keys];
+                            friendListData[elements.uid] = elements
+                        }
+                    }
+                }
+                const friendListWithInfos = {}
                 //合并两对象
                 const mergedFriendList = _.merge(
                     friendListData,
@@ -100,14 +121,25 @@ export const uesContacts = defineStore('contacts', {
                 )
 
                 this.contacts.friendList = _.assign({}, mergedFriendList)
-                //提交之后订阅好友状态
-                await this.subFriendsPresence(data)
-            } catch (error) {
-                //异常一般为获取会话异常，直接提交好友列表
-                this.contacts.friendList = _.assign({}, friendListData)
-                //提交之后订阅好友状态
-                await this.subFriendsPresence(data)
-            }
+                console.log(this.contacts.friendList,this.storeFriendList,99999)
+                try {
+                    //获取好友列表 接口获取
+                    // data.length > 0 &&
+                    //     data.map((item:any) => (friendListData[item] = { uid: item }))
+                    //     console.log(friendListData)
+                    //获取好友列表对应的用户属性
+                    //提交之后订阅好友状态
+                    await this.subFriendsPresence(friendListData)
+                    resolve(true)
+                } catch (error) {
+                    //异常一般为获取会话异常，直接提交好友列表
+                    this.contacts.friendList = _.assign({}, friendListData)
+                    //提交之后订阅好友状态
+                    await this.subFriendsPresence(data)
+                    reject(error)
+                }
+            })
+            
 
         },
 
@@ -119,7 +151,7 @@ export const uesContacts = defineStore('contacts', {
         async onAddedNewFriend( params:any){
             const { from: userId } = params
             let friendData:any = {}
-            friendData[userId] = { hxId: userId }
+            friendData[userId] = { uid: userId }
             try {
                 const newfriendInfos = await this.getOtherUserInfo([userId])
                 console.log('newfriendInfos', newfriendInfos)
@@ -157,7 +189,7 @@ export const uesContacts = defineStore('contacts', {
 
         async subFriendsPresence (users:any){
             const requestTask:any = []
-            const usersArr = _.chunk([...users], 5) //分拆users 订阅好友状态一次不能超过100个
+            const usersArr = _.chunk([], 5) //分拆users 订阅好友状态一次不能超过100个
             try {
                 usersArr.length > 0 &&
                     usersArr.map((userItem) =>
@@ -223,4 +255,12 @@ export const uesContacts = defineStore('contacts', {
         },
 
 	},
+
+    getters: {
+        storeFriendList(state){
+            return state.contacts.friendList
+       
+        }
+        
+    }
 });

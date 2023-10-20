@@ -4,12 +4,17 @@ import { pinyin } from 'pinyin-pro'
 export default function (friendItemData) {
     const resultObj = {}
     const containerObj = {}
+    console.log(friendItemData)
     for (const key in friendItemData) {
         if (Object.hasOwnProperty.call(friendItemData, key)) {
             const v = friendItemData[key]
-            const pinyinKey = v.nickname
-                ? pinyin(v.nickname, { pattern: 'initial' })[0]
-                : pinyin(v.hxId, { pattern: 'initial' })[0]
+
+            const pinyinKey = v.initials
+            // const pinyinKey = v.username
+            //     ? pinyin(v.username, { toneType: 'none' })[0]
+            //     : pinyin(v.uid, { toneType: 'none' })[0]
+            console.log(pinyinKey)
+            console.log(containerObj[pinyinKey])
             if (containerObj[pinyinKey]) {
                 containerObj[pinyinKey].push(v)
             } else {

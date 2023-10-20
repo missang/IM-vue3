@@ -1,28 +1,29 @@
 <script setup>
 import { ref, watch, toRaw, nextTick, computed, onMounted } from 'vue'
 import _ from 'lodash'
-import { useStore } from 'vuex'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
-import { messageType, warningText } from '@/constant'
+import { messageType, warningText } from '/@/constant'
 import { ElMessage } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
-import waterMark from '@/utils/waterMark'
+// import waterMark from '/@/utils/waterMark'
 /* 组件 */
-import MessageList from './components/messageList'
-import InputBox from './components/inputBox'
-import UserStatus from '@/components/UserStatus'
-import GroupsDetails from '@/views/Chat/components/AboutGroups/GroupsDetails'
+import MessageList from './components/messageList/index.vue'
+import InputBox from './components/inputBox/index.vue'
+import UserStatus from '/@/components/UserStatus/index.vue'
+import GroupsDetails from '/@/views/Chat/components/AboutGroups/GroupsDetails/index.vue'
 /* store */
-const store = useStore()
+import { useGroups } from '/@/stores/goups';
+import { uesContacts } from '/@/stores/contacts';
+const contactsStore = uesContacts()
+const groupsStore = useGroups()
 /* route */
 const route = useRoute()
 const { CHAT_TYPE } = messageType
 const { EASEIM_HINT, SWINDLER_GO_DIE, WARM_TIP } = warningText
 const nowPickInfo = ref({})
-const friendList = computed(() => store.state.Contacts.friendList)
-const groupList = computed(() => store.state.Contacts.groupList)
-/* loginstatus */
-const loginState = computed(() => store.state.loginState)
+console.log(contactsStore.storeFriendList,123456)
+const friendList = computed(() => contactsStore.storeFriendList)
+const groupList = computed(() => contactsStore.contacts.groupList)
 /* header 操作 */
 const drawer = ref(false) //抽屉显隐
 const handleDrawer = () => {
@@ -42,16 +43,16 @@ const delTheFriend = () => {
 
 // }
 /* warningTips */
-const isShowWarningTips = computed(() => store.state.isShowWarningTips)
+// const isShowWarningTips = computed(() => store.state.isShowWarningTips)
 const randomTips = computed(() => {
     return _.toString(_.sampleSize(SWINDLER_GO_DIE, 1))
 })
 /* warterMark */
 onMounted(() => {
     const chatContainer = document.querySelector('.chat_message_main')
-    chatContainer && waterMark({ container: chatContainer })
+    // chatContainer && waterMark({ container: chatContainer })
 })
-const closeWarningTips = () => store.commit('CLOSE_WARNING_TIPS')
+// const closeWarningTips = () => store.commit('CLOSE_WARNING_TIPS')
 /* userInfo */
 //获取路由ID对应的信息
 const getIdInfo = async ({ id, chatType }) => {
@@ -63,21 +64,21 @@ const getIdInfo = async ({ id, chatType }) => {
             return
         }
     }
-    //类型为群组
-    if (chatType === CHAT_TYPE.GROUP) {
-        const goupid =
-            groupList.value[id]?.groupid && groupList.value[id]?.groupid
-        goupid && (await store.dispatch('fetchMultiGoupsInfos', goupid))
-        if (groupList.value[id]?.groupDetail) {
-            return (nowPickInfo.value.groupDetail =
-                groupList.value[id].groupDetail)
-        } else {
-            //如果不存在用户属性则请求获取该群群详情。
-            await store.dispatch('getAssignGroupDetail', id)
-            return (nowPickInfo.value.groupDetail =
-                groupList.value[id].groupDetail)
-        }
-    }
+    // //类型为群组
+    // if (chatType === CHAT_TYPE.GROUP) {
+    //     const goupid =
+    //         groupList.value[id]?.groupid && groupList.value[id]?.groupid
+    //     goupid && (await groupsStore().fetchMultiGoupsInfos(goupid))
+    //     if (groupList.value[id]?.groupDetail) {
+    //         return (nowPickInfo.value.groupDetail =
+    //             groupList.value[id].groupDetail)
+    //     } else {
+    //         //如果不存在用户属性则请求获取该群群详情。
+    //         await groupsStore().getAssignGroupDetail(id)
+    //         return (nowPickInfo.value.groupDetail =
+    //             groupList.value[id].groupDetail)
+    //     }
+    // }
 }
 //监听路由改变获取对应的getIdInfo
 const stopWatchRoute = watch(
@@ -86,13 +87,14 @@ const stopWatchRoute = watch(
         console.log('>>>>>>>>监听到路由参数变化', routeVal)
         if (routeVal) {
             nowPickInfo.value = { ...routeVal }
-            loginState.value && getIdInfo(routeVal)
+            getIdInfo(routeVal)
         }
     },
     {
         immediate: true
     }
 )
+getIdInfo(route.query)
 //获取群组详情
 const groupDetail = computed(
     () =>
@@ -112,53 +114,55 @@ const notScrollBottom = ref(false) //是否滚动置底
 const fechHistoryMessage = (loadType) => {
     if (!nowPickInfo.value) return []
     return async () => {
-        loadingHistoryMsg.value = true
-        notScrollBottom.value = true
-        if (loadType == 'fistLoad') {
-            const { messages } = await store.dispatch('getHistoryMessage', {
-                ...nowPickInfo.value,
-                cursor: -1
-            })
-            if (messages.length > 0) {
-                //返回数组有数据显示加载更多
-                isMoreHistoryMsg.value = true
-            } else {
-                //否则已无更多。
-                isMoreHistoryMsg.value = false
-            }
-            setTimeout(() => {
-                scrollMessageList('bottom')
-            }, 500)
-        } else {
-            const fistMessageId =
-                messageData.value[0] && messageData.value[0].id
-            const { messages } = await store.dispatch('getHistoryMessage', {
-                ...nowPickInfo.value,
-                cursor: fistMessageId
-            })
-            if (messages.length > 0) {
-                //返回数组有数据显示加载更多
-                isMoreHistoryMsg.value = true
-            } else {
-                //否则已无更多。
-                isMoreHistoryMsg.value = false
-            }
-            scrollMessageList('normal')
-        }
-        loadingHistoryMsg.value = false
-        notScrollBottom.value = false
+        // loadingHistoryMsg.value = true
+        // notScrollBottom.value = true
+        // if (loadType == 'fistLoad') {
+        //     const { messages } = await store.dispatch('getHistoryMessage', {
+        //         ...nowPickInfo.value,
+        //         cursor: -1
+        //     })
+        //     const { messages } = await store.dispatch('getHistoryMessage', {
+        //         ...nowPickInfo.value,
+        //         cursor: -1
+        //     })
+        //     if (messages.length > 0) {
+        //         //返回数组有数据显示加载更多
+        //         isMoreHistoryMsg.value = true
+        //     } else {
+        //         //否则已无更多。
+        //         isMoreHistoryMsg.value = false
+        //     }
+        //     setTimeout(() => {
+        //         scrollMessageList('bottom')
+        //     }, 500)
+        // } else {
+        //     const fistMessageId =
+        //         messageData.value[0] && messageData.value[0].id
+        //     const { messages } = await store.dispatch('getHistoryMessage', {
+        //         ...nowPickInfo.value,
+        //         cursor: fistMessageId
+        //     })
+        //     if (messages.length > 0) {
+        //         //返回数组有数据显示加载更多
+        //         isMoreHistoryMsg.value = true
+        //     } else {
+        //         //否则已无更多。
+        //         isMoreHistoryMsg.value = false
+        //     }
+        //     scrollMessageList('normal')
+        // }
+        // loadingHistoryMsg.value = false
+        // notScrollBottom.value = false
     }
 }
 //获取其id对应的消息内容
 const messageData = computed(() => {
     //如果Message.messageList中不存在的话调用拉取漫游取一下历史消息
-    if (loginState.value) {
-        return (
-            (nowPickInfo.value.id &&
-                store.state.Message.messageList[nowPickInfo.value.id]) ||
-            fechHistoryMessage('fistLoad')()
-        )
-    }
+        // return (
+        //     (nowPickInfo.value.id &&
+        //         store.state.Message.messageList[nowPickInfo.value.id]) ||
+        //     fechHistoryMessage('fistLoad')()
+        // )
 })
 
 const messageContainer = ref(null)
@@ -223,19 +227,19 @@ const reEditMessage = (msg) => (inputBox.value.textContent = msg)
 const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
 </script>
 <template>
-    <el-container v-if="loginState" class="app_container">
+    <el-container class="app_container">
         <el-header class="chat_message_header">
             <template v-if="nowPickInfo.chatType === CHAT_TYPE.SINGLE">
                 <div v-if="nowPickInfo.userInfo" class="chat_user_box">
                     <span class="chat_user_name">
                         {{
-                            nowPickInfo.userInfo.nickname || nowPickInfo.id
+                            nowPickInfo.userInfo.username || nowPickInfo.id
                         }}</span
                     >
                     <UserStatus :userStatus="nowPickInfo.userInfo.userStatus" />
                 </div>
                 <div v-else>
-                    {{ nowPickInfo.id
+                    {{ nowPickInfo
                     }}<span style="font-size: 10px">(非好友)</span>
                 </div>
             </template>
@@ -300,7 +304,7 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
                 </el-dropdown>
             </span>
         </el-header>
-        <div v-if="isShowWarningTips" class="easeim_safe_tips">
+        <!-- <div v-if="isShowWarningTips" class="easeim_safe_tips">
             <p>{{ EASEIM_HINT }}</p>
             <p>【防骗提示】{{ randomTips }}</p>
             <p
@@ -316,7 +320,7 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
                     <Close />
                 </el-icon>
             </span>
-        </div>
+        </div> -->
         <el-main class="chat_message_main">
             <el-scrollbar class="main_container" ref="messageContainer">
                 <div class="innerRef">

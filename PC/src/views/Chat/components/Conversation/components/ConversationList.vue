@@ -38,7 +38,7 @@ const handleConversationName = computed(() => {
     return (item) => {
         if (item.conversationType === CHAT_TYPE.SINGLE) {
             const friend = friendList.value[item.conversationKey]
-            return friend?.nickname || item.conversationInfo.name
+            return friend?.username || item.conversationInfo.name
         }
         if (item.conversationType === CHAT_TYPE.GROUP) {
             const group = joinedGroupList.value[item.conversationKey]
@@ -52,7 +52,7 @@ const handleConversationName = computed(() => {
     }
 })
 //处理lastmsg的from昵称
-const handleLastMsgNickName = computed(() => {
+const handleLastMsgusername = computed(() => {
     const friendList = []
     const groupsInfos = []
     return (conversation) => {
@@ -63,11 +63,11 @@ const handleLastMsgNickName = computed(() => {
         } = conversation
         const { fromId } = fromInfo || {}
         if (conversationType === CHAT_TYPE.GROUP) {
-            const userInfoFromGroupNickname =
-                groupsInfos[groupId]?.groupMemberInfo?.[fromId]?.nickName
-            const friendUserInfoNickname = friendList[fromId]?.nickname
+            const userInfoFromGroupusername =
+                groupsInfos[groupId]?.groupMemberInfo?.[fromId]?.username
+            const friendUserInfousername = friendList[fromId]?.username
             return `${
-                userInfoFromGroupNickname || friendUserInfoNickname || fromId
+                userInfoFromGroupusername || friendUserInfousername || fromId
             }：`
         }
     }
@@ -178,12 +178,12 @@ const deleteConversation = (itemKey) => {
                                         :src="
                                             friendList[item.conversationKey] &&
                                             friendList[item.conversationKey]
-                                                .avatarurl
+                                                .avatar
                                                 ? friendList[
                                                       item.conversationKey
-                                                  ].avatarurl
+                                                  ].avatar
                                                 : item.conversationInfo
-                                                      .avatarUrl
+                                                      .avatar
                                         "
                                     >
                                     </el-avatar>
@@ -204,7 +204,7 @@ const deleteConversation = (itemKey) => {
                                             item.conversationType ===
                                             CHAT_TYPE.GROUP
                                         "
-                                        >{{ handleLastMsgNickName(item) }}</span
+                                        >{{ handleLastMsgusername(item) }}</span
                                     >
                                     {{ item.latestMessage.msg }}
                                 </div>

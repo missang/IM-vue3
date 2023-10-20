@@ -7,15 +7,15 @@ import defaultAvatar from '/@/assets/images/avatar/theme2x.png'
 /* store */
 import { uesContacts } from '/@/stores/contacts';
 const contactsStore = uesContacts()
-
 //处理friendList进行分类处理
-const classifyFriendList = computed(() => contactsStore().sortedFriendList())
+const classifyFriendList = computed(() => contactsStore.sortedFriendList());
+
 //点击对应联系人跳转至用户详情页
 const { CHAT_TYPE } = messageType
 </script>
 
 <template>
-    <div class="friendItem_container">
+    <div class="friendItem_container" >
         <div
             v-for="(friendName, friendItemKey) in classifyFriendList"
             :key="friendItemKey"
@@ -38,10 +38,10 @@ const { CHAT_TYPE } = messageType
                         class="friendItem_box"
                         :span="24"
                         v-for="item in friendName"
-                        :key="item.hxId"
+                        :key="item.uid"
                         @click="
                             $emit('toContacts', {
-                                id: item.hxId,
+                                id: item.uid,
                                 chatType: CHAT_TYPE.SINGLE
                             })
                         "
@@ -50,12 +50,12 @@ const { CHAT_TYPE } = messageType
                             style="margin-right: 11px"
                             :size="33.03"
                             :src="
-                                item.avatarurl ? item.avatarurl : defaultAvatar
+                                item.avatar ? item.avatar : defaultAvatar
                             "
                         >
                         </el-avatar>
                         <span class="friend_name">
-                            {{ item.nickname ? item.nickname : item.hxId }}
+                            {{ item.username ? item.username : item.name }}
                         </span>
                     </el-col>
                 </el-row>

@@ -2,7 +2,7 @@ import request from '/@/utils/request';
 import { Session } from '/@/utils/storage';
 import { validateNull } from '/@/utils/validate';
 import { useUserInfo } from '/@/stores/userInfo';
-import other from '/@/utils/other';
+// import other from '/@/utils/other';
 
 /**
  * https://www.ietf.org/rfc/rfc6749.txt
@@ -26,6 +26,7 @@ export const login = (data: any) => {
 		// params: { username, password },
 		data: { username, password },
 		headers: {
+			skipToken: 'true',
 			'Content-Type': FORM_CONTENT_TYPE,
 		},
 	});
@@ -41,7 +42,7 @@ export const loginByMobile = (mobile: any, code: any) => {
 	return request({
 		url: '/auth/oauth2/token',
 		headers: {
-			skipToken: true,
+			// skipToken: true,
 			Authorization: basicAuth,
 			'Content-Type': FORM_CONTENT_TYPE,
 		},
@@ -59,7 +60,7 @@ export const loginBySocial = (state: string, code: string) => {
 	return request({
 		url: '/auth/oauth2/token',
 		headers: {
-			skipToken: true,
+			// skipToken: true,
 			Authorization: basicAuth,
 			'Content-Type': FORM_CONTENT_TYPE,
 		},
@@ -84,7 +85,7 @@ export const refreshTokenApi = (refresh_token: string) => {
 	return request({
 		url: '/auth/oauth2/token',
 		headers: {
-			skipToken: true,
+			// skipToken: true,
 			Authorization: basicAuth,
 			'Content-Type': FORM_CONTENT_TYPE,
 		},

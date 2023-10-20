@@ -108,15 +108,16 @@ export const notFoundAndNoPower = [
  * 所有节点都是挂载此节点下
  */
 export const baseRoutes: Array<RouteRecordRaw> = [
-	// {
-	// 	path: '/',
-	// 	name: '/',
-	// 	component: () => import('/@/views/Chat/index.vue'),
-	// 	meta: {
-	// 		isKeepAlive: true,
-	// 	},
-	// 	children: [],
-	// },
+	{
+		path: '/',
+		name: '/',
+		component: () => import('/@/views/Chat/index.vue'),
+        redirect: '/chat',
+		meta: {
+			isKeepAlive: true,
+		},
+		children: [],
+	},
 
     /* 聊天页 */
     {
@@ -143,11 +144,11 @@ export const baseRoutes: Array<RouteRecordRaw> = [
                     //     path: 'informdetails',
                     //     component: () => import('/@/views/Chat/components/InformDetails'),
                     // },
-                    // //聊天对话框
-                    // {
-                    //     path: 'message',
-                    //     component: () => import('/@/views/Chat/components/Message'),
-                    // },
+                    //聊天对话框
+                    {
+                        path: 'message',
+                        component: () => import('/@/views/Chat/components/Message/index.vue'),
+                    },
                 ],
             },
             // /* 联系人页 */
@@ -160,23 +161,23 @@ export const baseRoutes: Array<RouteRecordRaw> = [
                 },
                 component: () => import('/@/views/Chat/components/Contacts/index.vue'),
                 children: [
-                    // {
-                    //     path: 'message',
+                    {
+                        path: 'message',
 
-                    //     component: () => import('/@/views/Chat/components/Message'),
-                    // },
+                        component: () => import('/@/views/Chat/components/Message/index.vue'),
+                    },
                     // //系统通知详情框
                     // {
                     //     path: 'informdetails',
                     //     component: () => import('/@/views/Chat/components/InformDetails'),
                     // },
-                    // {
-                    //     path: 'contactInfo',
-                    //     component: () =>
-                    //         import(
-                    //             '/@/views/Chat/components/Contacts/components/contactInfo.vue'
-                    //         ),
-                    // },
+                    {
+                        path: 'contactInfo',
+                        component: () =>
+                            import(
+                                '/@/views/Chat/components/Contacts/components/contactInfo.vue'
+                            ),
+                    },
                 ],
             },
         ],

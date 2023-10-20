@@ -1,25 +1,25 @@
 <script setup>
 import { ref, toRefs, computed, defineProps } from 'vue'
-import { useStore } from 'vuex'
 import { handleSDKErrorNotifi } from '/@/utils/handleSomeData'
 import { ElLoading, ElMessageBox } from 'element-plus'
 import { onClickOutside } from '@vueuse/core'
 import { emojis } from '/@/constant'
 import { messageType } from '/@/constant'
 import _ from 'lodash'
-import { EaseChatSDK, EaseChatClient } from '@/IM/initwebsdk'
+// import { EaseChatSDK, EaseChatClient } from 
 /* 组件 */
 import CollectAudio from '../suit/audio.vue'
 import PreviewSendImg from '../suit/previewSendImg.vue'
 import MsgQuote from '../suit/msgQuote.vue'
-import { useGetUserMapInfo } from '@/hooks'
+import  useGetUserMapInfo  from '/@/hooks/useGetUserMapInfo'
 //vue at
 import VueAt from 'vue-at/dist/vue-at-textarea' // for textarea
 //EaseCallKit Invite
-import { useManageChannel } from '@/components/EaseCallKit/hooks'
+import { useManageChannel } from '/@/components/EaseCallKit/hooks'
 //inviteMembers modal
-import InviteCallMembers from '@/components/InviteCallMembers'
-const store = useStore()
+import InviteCallMembers from '/@/components/InviteCallMembers/index.vue'
+import { useGroups } from '/@/stores/goups';
+const groupsStore = useGroups()
 const props = defineProps({
     nowPickInfo: {
         type: Object,
@@ -40,27 +40,28 @@ const { getTheGroupNickNameById } = useGetUserMapInfo()
 //AT 逻辑
 const atMembersList = computed(() => {
     let members = [{ text: MENTION_ALL.TEXT, value: MENTION_ALL.VALUE }]
+    console.log(nowPickInfo.value?.id)
     const groupId = nowPickInfo.value?.id
     //TODO text部分应为获取群组成员的自定义属性，待后续增加可设置自定在群组当中的自定义属性。
-    if (groupId) {
-        const sourceMembers =
-            store.state.Groups.groupsInfos[groupId]?.members || []
-        sourceMembers.length &&
-            sourceMembers.forEach((item) => {
-                if (
-                    item.owner !== EaseChatClient.user &&
-                    item.member !== EaseChatClient.user
-                ) {
-                    members.push({
-                        text: getTheGroupNickNameById(
-                            groupId,
-                            item.owner || item.member
-                        ),
-                        value: item.owner || item.member
-                    })
-                }
-            })
-    }
+    // if (groupId) {
+    //     const sourceMembers =
+    //         groupsStore.groupsInfos[groupId]?.members || []
+    //     sourceMembers.length &&
+    //         sourceMembers.forEach((item) => {
+    //             if (
+    //                 item.owner !== EaseChatClient.user &&
+    //                 item.member !== EaseChatClient.user
+    //             ) {
+    //                 members.push({
+    //                     text: getTheGroupNickNameById(
+    //                         groupId,
+    //                         item.owner || item.member
+    //                     ),
+    //                     value: item.owner || item.member
+    //                 })
+    //             }
+    //         })
+    // }
     return members
 })
 console.log(atMembersList.value)
@@ -422,13 +423,14 @@ const all_func = [
         style: 'font-size: 20px;',
         title: '发送语音',
         methodName: showRecordBox
-    },
-    {
-        className: 'icon-lajitong',
-        style: 'font-size: 23px;',
-        title: '清屏',
-        methodName: clearScreen
     }
+    // ,
+    // {
+    //     className: 'icon-lajitong',
+    //     style: 'font-size: 23px;',
+    //     title: '清屏',
+    //     methodName: clearScreen
+    // }
 ]
 
 /* About EaseCallKit */
@@ -441,26 +443,26 @@ const handleInviteCall = (handleType) => {
         const callType = CALL_TYPES.SINGLE_VOICE
         sendInviteMessage(toId, callType)
         //发送邀请信息后创建一条本地系统通知类消息上屏展示
-        const params = {
-            from: EaseChatClient.user,
-            to: toId,
-            chatType: CHAT_TYPE.SINGLE,
-            msg: `邀请【${toId}】进行语音通话`
-        }
-        store.dispatch('createInformMessage', params)
+        // const params = {
+        //     from: EaseChatClient.user,
+        //     to: toId,
+        //     chatType: CHAT_TYPE.SINGLE,
+        //     msg: `邀请【${toId}】进行语音通话`
+        // }
+        // store.dispatch('createInformMessage', params)
     }
     if (handleType === 'video') {
         if (nowPickInfo.value?.chatType === CHAT_TYPE.SINGLE) {
             const callType = CALL_TYPES.SINGLE_VIDEO
             sendInviteMessage(toId, callType)
             //发送邀请信息后创建一条本地系统通知类消息上屏展示
-            const params = {
-                from: EaseChatClient.user,
-                to: toId,
-                chatType: CHAT_TYPE.SINGLE,
-                msg: `邀请【${toId}】进行视频通话`
-            }
-            store.dispatch('createInformMessage', params)
+            // const params = {
+            //     from: EaseChatClient.user,
+            //     to: toId,
+            //     chatType: CHAT_TYPE.SINGLE,
+            //     msg: `邀请【${toId}】进行视频通话`
+            // }
+            // store.dispatch('createInformMessage', params)
         } else if (nowPickInfo.value?.chatType === CHAT_TYPE.GROUP) {
             //群组则弹出多人模态框
             showInviteCallMembersModal()
@@ -502,7 +504,7 @@ defineExpose({
     <div class="chat_func_box">
         <span
             v-for="iconItem in all_func"
-            :class="['iconfont', iconItem.className]"
+            :class="['chat_iconfont', iconItem.className]"
             :key="iconItem.className"
             :style="iconItem.style"
             :title="iconItem.title"
@@ -512,14 +514,14 @@ defineExpose({
         <!-- 群组没有语音发起 -->
         <template v-if="isHttps">
             <span
-                class="iconfont icon-31dianhua"
+                class="chat_iconfont icon-31dianhua"
                 style="font-size: 20px"
                 title="语音通话"
                 v-show="nowPickInfo.chatType === CHAT_TYPE.SINGLE"
                 @click="handleInviteCall('voice')"
             ></span>
             <span
-                class="iconfont icon-video"
+                class="chat_iconfont icon-video"
                 style="font-size: 20px"
                 title="视频通话"
                 @click="handleInviteCall('video')"
