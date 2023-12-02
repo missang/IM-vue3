@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import _ from 'lodash'
-import { uesContacts } from '/@/stores/contacts';
-const contactsStore = uesContacts()
+import { uesContacts } from './contacts';
 /**
  * 路由列表
  * @methods setRoutesList 设置路由数据
@@ -14,6 +13,15 @@ export const useGroups = defineStore('goups', {
         groupsInfos: null
 	}),
 	actions: {
+        
+        set_groups_admins ( payload:any) {
+            console.log('>>>>>开始赋值群组管理员', payload)
+            const { groupId, admin } = payload
+            if (!this.groupsInfos[groupId]) {
+                this.groupsInfos[groupId] = {}
+            }
+            this.groupsInfos[groupId].admin = admin
+        },
 
         //初始群信息需要多个请求
         async fetchMultiGoupsInfos (groupid :any){
@@ -35,7 +43,7 @@ export const useGroups = defineStore('goups', {
             // })
             // commit('SET_GORUPS_ADMINS', { groupId: params, admin: data })
 
-
+            this.set_groups_admins(groupId)
             if (!this.groupsInfos[groupId]) {
                 this.groupsInfos[groupId] = {}
             }
@@ -221,40 +229,42 @@ export const useGroups = defineStore('goups', {
         },
         // 修改群名或者群详情
         async modifyGroupInfo ( params:any) {
+            const contactsStore = uesContacts();
             const { groupid, modifyType, content } = params
             //0 是修改群名
-            // if (modifyType === 0) {
-            //     const option = {
-            //         groupId: groupid,
-            //         groupName: content
-            //     }
-            //     await EaseChatClient.modifyGroup(option)
-            //     //更新本地缓存数据
-            //     commit('UPDATE_GROUP_INFOS', {
-            //         groupId: groupid,
-            //         type: 'groupName',
-            //         params: content
-            //     })
-            //     commit('UPDATE_GROUP_LIST', {
-            //         type: 'updateGroupName',
-            //         groupId: groupid,
-            //         groupName: content
-            //     })
-            // }
-            // //1 是修改群详情
-            // if (modifyType === 1) {
-            //     const option = {
-            //         groupId: groupid,
-            //         description: content
-            //     }
-            //     await EaseChatClient.modifyGroup(option)
-            //     //更新本地缓存数据
-            //     commit('UPDATE_GROUP_INFOS', {
-            //         groupId: groupid,
-            //         type: 'groupDescription',
-            //         params: content
-            //     })
-            // }
+            if (modifyType === 0) {
+                const option = {
+                    groupId: groupid,
+                    groupName: content
+                }
+                // await EaseChatClient.modifyGroup(option)
+                //更新本地缓存数据
+                contactsStore.update_group_infos({
+                    groupId: groupid,
+                    type: 'groupName',
+                    params: content
+                })
+
+                contactsStore.update_group_list({
+                    type: 'updateGroupName',
+                    groupId: groupid,
+                    groupName: content
+                })
+            }
+            //1 是修改群详情
+            if (modifyType === 1) {
+                const option = {
+                    groupId: groupid,
+                    description: content
+                }
+                // await EaseChatClient.modifyGroup(option)
+                //更新本地缓存数据
+                contactsStore.update_group_infos({
+                    groupId: groupid,
+                    type: 'groupDescription',
+                    params: content
+                })
+            }
         },
         // 设置/修改群组公告
         async modifyGroupAnnouncement ( params:any){
@@ -282,6 +292,7 @@ export const useGroups = defineStore('goups', {
         },
         //移出群成员
         async removeTheGroupMember ( params:any){
+            const contactsStore = uesContacts();
             //SDK入参属性名是确定的此示例直接将属性名改为了SDK所识别的参数如果修改，具体请看文档。
             const { username, groupId } = params
             try {
@@ -306,6 +317,7 @@ export const useGroups = defineStore('goups', {
         },
         //添加用户到黑名单
         async addMemberToBlackList ( params:any) {
+            const contactsStore = uesContacts();
             const { groupId, usernames } = params
             try {
                 //SDK入参属性名是确定的此示例直接将属性名改为了SDK所识别的参数如果修改，具体请看文档。
@@ -422,6 +434,7 @@ export const useGroups = defineStore('goups', {
         },
         //退出群组
         async leaveIntheGroup ( params:any) {
+            const contactsStore = uesContacts();
             if (!params.groupId) return
             const { groupId } = params
             return new Promise((resolve, reject) => {
@@ -430,10 +443,11 @@ export const useGroups = defineStore('goups', {
                 //     groupId: groupId
                 // })
                 //     .then((res) => {
-                //         commit('UPDATE_GROUP_LIST', {
-                //             type: 'deleteFromList',
-                //             groupId: groupId
-                //         })
+
+                            // contactsStore.update_group_list({
+                            //     type: 'deleteFromList',
+                            //     groupId: groupId
+                            // })
                 //         resolve(res)
                 //     })
                 //     .catch((err) => {
@@ -443,6 +457,7 @@ export const useGroups = defineStore('goups', {
         },
         //解散群组
         destroyInTheGroup: async ( params:any) => {
+            const contactsStore = uesContacts();
             if (!params.groupId) return
             const { groupId } = params
             return new Promise((resolve, reject) => {
@@ -453,10 +468,10 @@ export const useGroups = defineStore('goups', {
                 // EaseChatClient.destroyGroup(option)
                 //     .then((res) => {
                 //         resolve(res)
-                //         commit('UPDATE_GROUP_LIST', {
-                //             type: 'deleteFromList',
-                //             groupId: groupId
-                //         })
+                    // contactsStore.update_group_list({
+                    //     type: 'deleteFromList',
+                    //     groupId: groupId
+                    // })
                 //     })
                 //     .catch((err) => {
                 //         reject(err)

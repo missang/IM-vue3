@@ -2,32 +2,36 @@
 import { computed } from 'vue'
 import _ from 'lodash'
 
+import { useRouter } from 'vue-router'
+const router = useRouter()
 /* 搜索框组件 */
 import SearchInput from '/@/components/SearchInput/index.vue'
 /* 欢迎页 */
 import Welcome from '/@/components/Welcome/index.vue'
 /* 会话列表组件 */
 import ConversationList from './components/ConversationList.vue'
+import { uesConversation } from '/@/stores/conversation';
+const conversationStore = uesConversation()
 
 
 const conversationList = computed(() => {
-    // return _.values(store.state.Conversation.conversationListData)
+    return _.values(conversationStore.conversationListData)
 })
 
 //路由跳转-系统通知
 const toInformDetails = () => {
-    // router.push('/chat/conversation/informdetails')
+    router.push('/chat/conversation/informdetails')
 }
 
 //路由跳转-对应好友会话
 const toChatMessage = (id, chatType) => {
     console.log('>>>>>>>id', id)
-    // router.push({
-    //     path: '/chat/conversation/message', query: {
-    //         id,
-    //         chatType
-    //     }
-    // })
+    router.push({
+        path: '/chat/conversation/message', query: {
+            id,
+            chatType
+        }
+    })
 }
 
 </script>

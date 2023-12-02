@@ -19,7 +19,9 @@ import { useManageChannel } from '/@/components/EaseCallKit/hooks'
 //inviteMembers modal
 import InviteCallMembers from '/@/components/InviteCallMembers/index.vue'
 import { useGroups } from '/@/stores/goups';
+import {uesStoreMessage} from '/@/stores/message';
 const groupsStore = useGroups()
+const MessageStore = uesStoreMessage();
 const props = defineProps({
     nowPickInfo: {
         type: Object,
@@ -165,7 +167,7 @@ const sendTextMessage = _.debounce(async () => {
     messageQuoteRef.value?.clearQuoteContent()
     try {
         console.log('msgOptions', msgOptions)
-        await store.dispatch('sendShowTypeMessage', {
+        await MessageStore.sendShowTypeMessage({
             msgType: ALL_MESSAGE_TYPE.TEXT,
             msgOptions
         })
@@ -182,11 +184,13 @@ const sendTextMessage = _.debounce(async () => {
 //选择图片
 const uploadImgs = ref(null)
 const chooseImages = () => {
+    console.log('333')
     uploadImgs.value.click()
     console.log('uploadImgs')
 }
 //发送图片
 const sendImagesMessage = async (type, fileObj) => {
+    console.log(444)
     const file = {
         data: null, // file 对象。
         filename: '', //文件名称。
@@ -217,6 +221,10 @@ const sendImagesMessage = async (type, fileObj) => {
             msgOptions.width = img.width
             msgOptions.height = img.height
             console.log('height:' + img.height + '----' + img.width)
+            console.log({
+                    msgType: ALL_MESSAGE_TYPE.IMAGE,
+                    msgOptions: _.cloneDeep(msgOptions)
+            })
             try {
                 await store.dispatch('sendShowTypeMessage', {
                     msgType: ALL_MESSAGE_TYPE.IMAGE,

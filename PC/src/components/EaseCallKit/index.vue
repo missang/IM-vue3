@@ -30,7 +30,7 @@ import MultiCall from './components/multiCall.vue'
 /* props */
 const props = defineProps({
     //实力化后的SDK
-    EaseIMClient: {
+    MEIMClient: {
         type: Object,
         default: () => ({}),
         required: true
@@ -45,11 +45,11 @@ const props = defineProps({
 /* emits */
 const emits = defineEmits(['onInviteMembers'])
 /* 环信相关初始化配置 */
-// const { EaseIM, connectionName } = toRefs(props)
-const { EaseIMClient, msgCreateFunc } = props
-_setImClient(EaseIMClient, msgCreateFunc)
+// const { MEIM, connectionName } = toRefs(props)
+const { MEIMClient, msgCreateFunc } = props
+_setImClient(MEIMClient, msgCreateFunc)
 const msgListenerName = 'IM_MESSAGE'
-EaseIMClient.addEventHandler('IM_CONNECT', {
+MEIMClient.addEventHandler('IM_CONNECT', {
     onConnected: () => {
         console.log('%c>>>>EaseCallKitIM已连接', 'color:green;')
         setMessageListener()
@@ -77,16 +77,16 @@ const setMessageListener = () => {
     }
     //防止重复设置监听，设置之前先执行移除
     removeMessageListener()
-    EaseIMClient.addEventHandler(msgListenerName, msgListener)
+    MEIMClient.addEventHandler(msgListenerName, msgListener)
     //初始化当前登录ID
     setLoginUserHxId()
 }
 //移除信令监听
 const removeMessageListener = () =>
-    EaseIMClient.removeEventHandler(msgListenerName)
+    MEIMClient.removeEventHandler(msgListenerName)
 //当前登录用户ID
 const loginUserHxId = ref('')
-const setLoginUserHxId = () => (loginUserHxId.value = EaseIMClient.user || '')
+const setLoginUserHxId = () => (loginUserHxId.value = MEIMClient.user || '')
 /* CallKit status */
 const callCompsType = {
     singleCall: SingleCall,
@@ -115,7 +115,7 @@ const handleCallKitInvite = (msgBody) => {
     console.log('>>>>>开始处理被邀请消息')
     const { from, ext } = msgBody || {}
     //邀请消息发送者为自己则忽略
-    if (from === EaseIMClient.user) return
+    if (from === MEIMClient.user) return
     //非空闲回复busy
     if (callKitStatus.localClientStatus > CALLSTATUS.idle) {
         console.log('>>>>>回复忙碌')
@@ -136,11 +136,11 @@ const handleCallKitInvite = (msgBody) => {
 //处理接收到通话交互过程的CMD命令消息
 const handleCallKitCommand = (msgBody) => {
     //多端状态下信令消息发送者为自己则忽略
-    if (msgBody.from === EaseIMClient.user) return
+    if (msgBody.from === MEIMClient.user) return
     console.log('>>>>开始处理command命令消息', msgBody)
     const cmdMsgBody = Object.assign({}, msgBody.ext) || {}
     const { calleeDevId, callerDevId } = cmdMsgBody
-    const clientResource = EaseIMClient.context.jid.clientResource
+    const clientResource = MEIMClient.context.jid.clientResource
     const { action } = cmdMsgBody
     const { localClientStatus, channelInfos } = callKitStatus
     //当前有效会议ID
@@ -279,7 +279,7 @@ const handleCallKitCommand = (msgBody) => {
     case CALL_ACTIONS_TYPE.CONFIRM_CALLEE:
         {
             if (cmdMsgBody.calleeDevId !== clientResource) {
-                if (msgBody.to === EaseIMClient.user) {
+                if (msgBody.to === MEIMClient.user) {
                     updateLocalStatus(CALLSTATUS.idle) //更改状态为闲置
                     console.log('%c 已在其他设备处理', 'color:red;')
                     eventParams.type =
@@ -305,7 +305,7 @@ const handleCallKitCommand = (msgBody) => {
         }
         break
     case CALL_ACTIONS_TYPE.CANCEL: {
-        if (msgBody.from === EaseIMClient.user) return //【多端情况】被叫方设备id 如果不为当前用户登陆设备ID，则不处理。
+        if (msgBody.from === MEIMClient.user) return //【多端情况】被叫方设备id 如果不为当前用户登陆设备ID，则不处理。
         if (msgBody.from === callKitStatus.channelInfos.callerIMName)
             return updateLocalStatus(CALLSTATUS.idle)
         eventParams.type =
@@ -416,17 +416,17 @@ const handleCancelCall = () => {
 const handleVideoToVioce = () => {
     const { calleeIMName, callerIMName, callId } = callKitStatus.channelInfos
     const targetId =
-        calleeIMName === EaseIMClient.user ? callerIMName : calleeIMName
+        calleeIMName === MEIMClient.user ? callerIMName : calleeIMName
     SignalMsgs.sendVideoToVioce(targetId, callId)
     callKitStatus.channelInfos.callType = CALL_TYPES.SINGLE_VOICE
 }
 /* 获取agoraToken */
 const getAgoraRtcToken = async (callback) => {
-    const username = EaseIMClient.user
+    const username = MEIMClient.user
     const channelName = callKitStatus.channelInfos.channelName
     console.log('channelNamechannelNamechannelName', channelName)
     if (!username && !channelName) return
-    const { accessToken, agoraUserId } = await getRtcToken(EaseIMClient, {
+    const { accessToken, agoraUserId } = await getRtcToken(MEIMClient, {
         username,
         channelName
     })
@@ -438,10 +438,10 @@ const getAgoraRtcToken = async (callback) => {
 /* 获取channel信息 */
 const getAgoraChannelDetails = async (callback) => {
     console.log('>>>>>调用获取channel信息')
-    const username = EaseIMClient.user
+    const username = MEIMClient.user
     const channelName = callKitStatus.channelInfos.channelName
     if (!username && !channelName) return
-    const { result } = await getChannelDetails(EaseIMClient, {
+    const { result } = await getChannelDetails(MEIMClient, {
         username,
         channelName
     })

@@ -20,8 +20,8 @@ const ALL_MESSAGE_TYPE = {
     INFORM: 'inform' //这个类型不在消息类型内，属于自己定义的一种系统通知类的消息。
 }
 const CHAT_TYPE = {
-    SINGLE: 'singleChat',
-    GROUP: 'groupChat'
+    SINGLE: 'friend',
+    GROUP: 'group'
 }
 
 const MENTION_ALL = {

@@ -140,10 +140,10 @@ export const baseRoutes: Array<RouteRecordRaw> = [
                 component: () => import('/@/views/Chat/components/Conversation/index.vue'),
                 children: [
                     //系统通知详情框
-                    // {
-                    //     path: 'informdetails',
-                    //     component: () => import('/@/views/Chat/components/InformDetails'),
-                    // },
+                    {
+                        path: 'informdetails',
+                        component: () => import('/@/views/Chat/components/InformDetails.vue'),
+                    },
                     //聊天对话框
                     {
                         path: 'message',
@@ -166,11 +166,11 @@ export const baseRoutes: Array<RouteRecordRaw> = [
 
                         component: () => import('/@/views/Chat/components/Message/index.vue'),
                     },
-                    // //系统通知详情框
-                    // {
-                    //     path: 'informdetails',
-                    //     component: () => import('/@/views/Chat/components/InformDetails'),
-                    // },
+                    //系统通知详情框
+                    {
+                        path: 'informdetails',
+                        component: () => import('/@/views/Chat/components/InformDetails.vue'),
+                    },
                     {
                         path: 'contactInfo',
                         component: () =>

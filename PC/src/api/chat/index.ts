@@ -23,6 +23,20 @@ export function getFriendList() {
 		method: 'get',
 	});
 }
+
+/**
+ * @param
+ * 获取群或者个人的历史消息
+ */
+
+export function getHistoryMessage(query?: Object) {
+	return request({
+		url: '/h5/message/get',
+		method: 'get',
+		params: query,
+	});
+}
+
 /**
  * 查询当前用户信息
  * @param uid 用户id
@@ -61,7 +75,20 @@ export function getApplyFriendInfo(username: string) {
 		}
 	});
 }
-
+/**
+ * 获取群详情信息
+ * @param groupId
+ */
+export function getGroupDetail(gid:any,count = 1) {
+	return request({
+		url: '/h5/group/detail',
+		method: 'get',
+		params:{
+			gid:gid,
+			count:count
+		}
+	});
+}
 
 export function getInitialize() {
 	return axios.get(import.meta.env.VITE_API_URL + '/h5/pop/get');

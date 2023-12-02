@@ -11,14 +11,14 @@ import { messageType } from '/@/constant'
 import { sortPinyinFriendItem } from '/@/utils/handleSomeData'
 /* store */
 import { useUserInfo } from '/@/stores/userInfo';
-const stores = useUserInfo();
+const userInfoStore = useUserInfo();
 import _ from 'lodash'
 
 import defaultAvatar from '/@/assets/images/avatar/theme2x.png'
 const { CHAT_TYPE, ALL_MESSAGE_TYPE } = messageType
 /* 登陆用户的用户属性 */
 const loginUserInfo = computed(() => {
-    return stores.userInfos
+    return userInfoStore.userInfos
 })
 const dialogTableVisible = ref(false)
 

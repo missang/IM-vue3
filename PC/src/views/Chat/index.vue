@@ -35,6 +35,7 @@ import NavBar from '/@/views/Chat/components/NavBar/index.vue'
     transform: translateY(-50%);
     margin: auto auto;
     border-radius: 5px;
+    box-shadow: 0px 0px 12px 2px #eee;
 
     .chat_nav_bar {
       display: flex;

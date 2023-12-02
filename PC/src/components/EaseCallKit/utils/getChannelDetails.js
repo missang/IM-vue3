@@ -1,14 +1,14 @@
-export default function (EaseIMConn, payload) {
+export default function (MEIMConn, payload) {
     const { username, channelName } = payload
     const myHeaders = new Headers()
-    myHeaders.append('authorization', `Bearer ${EaseIMConn.context.accessToken}`)
+    myHeaders.append('authorization', `Bearer ${MEIMConn.context.accessToken}`)
     var requestOptions = {
         method: 'GET',
         headers: myHeaders,
         redirect: 'follow'
     }
     return new Promise(function (resolve, reject) {
-        fetch(`${EaseIMConn.apiUrl}/channel/mapper?userAccount=${username}&channelName=${channelName}&appkey=${window.encodeURIComponent(EaseIMConn.appKey)}`, requestOptions)
+        fetch(`${MEIMConn.apiUrl}/channel/mapper?userAccount=${username}&channelName=${channelName}&appkey=${window.encodeURIComponent(MEIMConn.appKey)}`, requestOptions)
             .then(response => response.text())
             .then(result => {
                 console.log('result', JSON.parse(result))

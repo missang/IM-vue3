@@ -73,7 +73,6 @@ const setDispatchThemeConfig = () => {
 // 页面加载时
 onMounted(async() => {
 		if (Session.getToken()){
-console.log(99999)
 			NextLoading.start();
 				// 触发初始化用户信息 pinia
 			await useUserInfo().setUserInfos();

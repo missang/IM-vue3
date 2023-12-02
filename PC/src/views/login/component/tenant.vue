@@ -1,5 +1,5 @@
 <template>
-	<div id="tenant" v-if="!autoTenantEnable">
+	<div id="tenant">
 		
 		<el-dropdown :show-timeout="70" :hide-timeout="50" trigger="click" @command="onLanguageChange">
 			<div class="layout-navbars-breadcrumb-user-icon">

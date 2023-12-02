@@ -17,6 +17,8 @@ import ModifyMessage from '../suit/modifyMessage.vue'
 import { uesContacts } from '/@/stores/contacts';
 import { useGroups } from '/@/stores/goups';
 import { useUserInfo } from '/@/stores/userInfo';
+import {uesStoreMessage} from '/@/stores/message';
+const MessageStore = uesStoreMessage();
 const contactsStore = uesContacts()
 const userInfoStore = useUserInfo()
 const groupsStore = useGroups()
@@ -40,17 +42,16 @@ const { messageData } = toRefs(props)
 const { ALL_MESSAGE_TYPE, CUSTOM_TYPE, CHAT_TYPE, CHANGE_MESSAGE_BODAY_TYPE } =
     messageType
 /* login uid */
-const loginUserId = 1
-
+const loginUserId = computed(() => userInfoStore.userInfos.uid)
 /* computed-- 消息来源是否为自己 */
 const isMyself = computed(() => {
-    return (msgBody) => {
-        return msgBody.from === loginUserId
+    return (msgBody:any) => {
+        return msgBody.from === loginUserId.value
     }
 })
 /* 文本中是否包含link */
 const isLink = computed(() => {
-    return (msg) => {
+    return (msg:string) => {
         return paseLink(msg).isLink
     }
 })
@@ -59,7 +60,7 @@ const loginUserInfo = computed(() => userInfoStore.userInfos)
 
 /* 获取他人的用户信息 */
 const otherUserInfo = computed(() => {
-    return (otherId) => {
+    return (otherId:number) => {
         const otherInfos = contactsStore.contacts.friendList[otherId] || {
             avatarurl: defaultAvatar
         }
@@ -71,7 +72,8 @@ const handleusername = computed(() => {
     const { chatType, id } = nowPickInfo.value
     const friendList = contactsStore.contacts.friendList
     const groupsInfos = groupsStore.groupsInfos
-    return (uid) => {
+    console.log(nowPickInfo.value,groupsInfos)
+    return (uid:number) => {
         if (chatType === CHAT_TYPE.SINGLE) {
             return friendList[uid]?.username || uid
         }
@@ -85,8 +87,9 @@ const handleusername = computed(() => {
 })
 /* 处理时间显示间隔 */
 const handleMsgTimeShow = computed(() => {
-    const msgList = Array.from(messageData.value)
-    return (time, index) => {
+    const msgList:any = messageData.value
+    console.log(messageData.value,888)
+    return (time:any, index:any) => {
         if (index !== 0) {
             const lastTime = msgList[index - 1].time
             return time - lastTime > 50000
@@ -103,7 +106,7 @@ const audioPlayStatus = reactive({
     playMsgId: '' //在播放的音频消息id,
 })
 //开始播放
-const startplayAudio = (msgBody) => {
+const startplayAudio = (msgBody:any) => {
     const armRec = new BenzAMRRecorder()
     const src = msgBody.url
     audioPlayStatus.playMsgId = msgBody.id
@@ -130,7 +133,7 @@ const startplayAudio = (msgBody) => {
 // const permissionRead = usePermission('clipboard-read') //请求剪切板读的权限
 // const permissionWrite = usePermission('clipboard-write') //请求剪切板写的权限
 const { copy, copied, isSupported } = useClipboard() //copy 复制方法 copied 是否已经复制 isSupported 是否支持剪切板
-const copyTextMessages = (msg) => {
+const copyTextMessages = (msg:string) => {
     copy(msg)
     if (copied) {
         ElMessage({
@@ -143,14 +146,14 @@ const copyTextMessages = (msg) => {
 }
 //引用消息
 let clickQuoteMsgId = ref('')
-const clickQuoteMessage = (msgQuote) => {
+const clickQuoteMessage = (msgQuote:any) => {
     const { msgID } = msgQuote
     nextTick(() => {
         const messageQuery = document.querySelectorAll('.messageList_box')
-        const filterQuoteMsg =
+        const filterQuoteMsg:any =
             messageQuery.length &&
             Array.from(messageQuery).filter(
-                (node) => msgID === node.dataset.mid
+                (node:any) => msgID === node.dataset.mid
             )
         if (filterQuoteMsg.length) {
             filterQuoteMsg[0].scrollIntoView()
@@ -168,29 +171,29 @@ const clickQuoteMessage = (msgQuote) => {
     })
 }
 //撤回消息
-const recallMessage = async ({ id, to, chatType }) => {
+const recallMessage = async ({ id, to, chatType }:any) => {
     const options = {
         mid: id,
         to: to,
         chatType: chatType
     }
     try {
-        // await store.dispatch('recallMessage', options)
-    } catch (error) {
+        await MessageStore.recallMessage(options)
+    } catch (error:any) {
         handleSDKErrorNotifi(error.type, error.message)
         console.log('>>>>>>撤回失败', error)
     }
 }
 //编辑消息
 
-const modifyMessageRef = ref(null)
-const showModifyMsgModal = (msgBody) => {
+const modifyMessageRef:any = ref(null)
+const showModifyMsgModal = (msgBody:any) => {
     nextTick(() => {
         modifyMessageRef.value.initModifyMessage(msgBody)
     })
 }
 //删除消息
-const deleteMessage = async (msgBody) => {
+const deleteMessage = async (msgBody:any) => {
     try {
         await ElMessageBox.confirm(
             '消息删除是从服务端删除，确认要删除吗？',
@@ -201,7 +204,7 @@ const deleteMessage = async (msgBody) => {
                 type: 'warning'
             }
         )
-        await store.dispatch('removeMessage', { ...msgBody })
+        await MessageStore.recallMessage({ ...msgBody })
         ElMessage({
             type: 'success',
             message: '消息已删除',
@@ -219,16 +222,16 @@ const deleteMessage = async (msgBody) => {
     }
 }
 // 消息举报
-const reportMessage = ref(null)
+const reportMessage:any = ref(null)
 //举报消息
-const informOnMessage = (msgBody) => {
+const informOnMessage = (msgBody:any) => {
     console.log('>>>>调用举报')
     reportMessage.value.alertReportMsgModal(msgBody)
 }
 //父组件重新编辑方法
-const reEdit = (msg) => emit('reEditMessage', msg)
+const reEdit = (msg:string) => emit('reEditMessage', msg)
 //调用父组件引用消息
-const onMsgQuote = (msg) => emit('messageQuote', msg)
+const onMsgQuote = (msg:string) => emit('messageQuote', msg)
 </script>
 <template>
     <div>

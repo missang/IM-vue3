@@ -1,36 +1,49 @@
 import { defineStore } from 'pinia';
-import { Session } from '/@/utils/storage';
+import { Local, Session } from '/@/utils/storage';
 
 // import other from '/@/utils/other';
+
+import { useLocalStorage,useStorage } from '@vueuse/core'
 import { useMessage } from '/@/hooks/message';
-import { sortPinyinFriendItem, handlePresence } from '/@/utils/handleSomeData'
-import { baseChat,getFriendList } from '/@/api/chat';
+import {
+    sortPinyinFriendItem, handlePresence, createConversation,
+    sortConversation,
+    createInform
+} from '/@/utils/handleSomeData';
+import {uesStoreMessage} from './message';
+import { useUserInfo } from './userInfo';
+import { uesConversation } from './conversation';
+import { baseChat, getFriendList,getGroupDetail } from '/@/api/chat';
 import _ from 'lodash'
 
 import { i18n } from '/@/i18n';
 const { t } = i18n.global;
+const userInfoStore = useUserInfo()
+const MessageStore = uesStoreMessage()
 
 /**
  * @function contacts
  * @returns {Contacts}
  */
 export const uesContacts = defineStore('contacts', {
-	state: (): Contacts => ({
-		contacts: {
+    state: (): Contacts => ({
+        contacts: {
             friendList: {},
             groupList: {},
-            friendBlackList: [],
-            conversationListData:[]
-		},
-	}),
-	actions: {
-        
-        async getBaseChat(){
+            friendBlackList: []
+        },
+    }),
+    actions: {
+        // 初始化基础消息
+        async getBaseChat() {
+            const conversationStore = uesConversation()
             return new Promise(async (resolve, reject) => {
                 try {
-                    const result = await baseChat();
-                    console.log(result)
+                   const result =  await baseChat();
+                   useLocalStorage(`IM_PC_${userInfoStore.userInfos.uid}_conversationList`, result.data.chatting)
                     await this.fetchAllFriendListFromServer()
+                    await this.fetchGroupList(result.data.group)
+                    conversationStore.init_conversation_state(userInfoStore.userInfos.uid)
                     resolve(true)
                 } catch (error) {
                     reject(error)
@@ -38,38 +51,38 @@ export const uesContacts = defineStore('contacts', {
             })
         },
 
-        
         //获取群组列表
-        async fetchGroupList( params:any) {
+        async fetchGroupList(params: any) {
+
+            let groupListData: any = {}
+            params.map((item:any)=>{
+                groupListData[item.gid] = {groupid:item.gid,groupname:item.name,...item}
+            })
             // 调用接口或者去stores拿数据
-            const res = await {data:{}}
-            const goupListData = _.keyBy(res.data, 'groupid')
-            // commit('SET_GROUP_LIST', { setType: 'init', data: goupListData })
-            this.setGroupList({setType: 'init', data: goupListData})
-            console.log('>>>>>触发了拉取群组列表更新')
+            const res = groupListData
+            const goupListData = _.keyBy(groupListData, 'gid')
+            this.setGroupList({ setType: 'init', data: goupListData })
+            console.log('>>>>>触发了拉取群组列表更新',goupListData)
         },
         //获取指定群详情
-        async getAssignGroupDetail  ( goupsId:number) {
-            const options = {
-                groupId: goupsId // 群组id
-            }
-            const result = await {data:[]}
+        async getAssignGroupDetail(goupsId: number) {
+            const result = await getGroupDetail(goupsId)
             // console.log('>>>>>>>群详情获取成功result', result);
-            result.data && this.setGroupList({setType: 'replenish', data: result.data[0]})
+            result.data && this.setGroupList({ setType: 'replenish', data: result.data.info })
         },
         //获取排序后好友列表
-        sortedFriendList(){
+        sortedFriendList() {
             return sortPinyinFriendItem(this.contacts.friendList)
         },
         //获取他人用户属性
-       async getOtherUserInfo (users:any) {
+        async getOtherUserInfo(users: any) {
             /**
              * @param {String|Array} users - 用户id
              */
 
             return new Promise(async (resolve, reject) => {
                 let usersInfosObj = {}
-                const requestTask:any = []
+                const requestTask: any = []
                 const usersArr = _.chunk([...users], 99) //分拆users 用户属性获取一次不能超过100个
                 try {
                     usersArr.length > 0 &&
@@ -83,10 +96,10 @@ export const uesContacts = defineStore('contacts', {
                     usersInfos.length > 0 &&
                         usersInfos.map(
                             (item) =>
-                                (usersInfosObj = Object.assign(
-                                    usersInfosObj,
-                                    item
-                                ))
+                            (usersInfosObj = Object.assign(
+                                usersInfosObj,
+                                item
+                            ))
                         )
                     resolve(usersInfosObj)
                 } catch (error) {
@@ -102,7 +115,7 @@ export const uesContacts = defineStore('contacts', {
         async fetchAllFriendListFromServer() {
 
             return new Promise(async (resolve, reject) => {
-                let friendListData:any = {}
+                let friendListData: any = {}
                 const { data } = await getFriendList()
                 for (const key in data) {
                     if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -121,7 +134,6 @@ export const uesContacts = defineStore('contacts', {
                 )
 
                 this.contacts.friendList = _.assign({}, mergedFriendList)
-                console.log(this.contacts.friendList,this.storeFriendList,99999)
                 try {
                     //获取好友列表 接口获取
                     // data.length > 0 &&
@@ -139,7 +151,7 @@ export const uesContacts = defineStore('contacts', {
                     reject(error)
                 }
             })
-            
+
 
         },
 
@@ -148,9 +160,9 @@ export const uesContacts = defineStore('contacts', {
          * @param payload 新增联系人
          * @returns 
          */
-        async onAddedNewFriend( params:any){
+        async onAddedNewFriend(params: any) {
             const { from: userId } = params
-            let friendData:any = {}
+            let friendData: any = {}
             friendData[userId] = { uid: userId }
             try {
                 const newfriendInfos = await this.getOtherUserInfo([userId])
@@ -169,26 +181,26 @@ export const uesContacts = defineStore('contacts', {
          * @param payload 删除本地联系人
          * @returns 
          */
-        async onDeleteFriend (params:any){
+        async onDeleteFriend(params: any) {
             //取消订阅好友状态。
             const { from: userId } = params
             this.unsubFriendsPresence([userId])
-            userId && delete  this.contacts.friendList[userId]
+            userId && delete this.contacts.friendList[userId]
         },
-        
+
         /**
          * 
          * @param payload 获取黑名单列表
          * @returns 
          */
-        async fetchBlackList () {
+        async fetchBlackList() {
             // 接口获取
-            const { data } = await {data:[]}
-            data.length > 0 && (()=>{this.contacts.friendBlackList = _.assign([], data) })
+            const { data } = await { data: [] }
+            data.length > 0 && (() => { this.contacts.friendBlackList = _.assign([], data) })
         },
 
-        async subFriendsPresence (users:any){
-            const requestTask:any = []
+        async subFriendsPresence(users: any) {
+            const requestTask: any = []
             const usersArr = _.chunk([], 5) //分拆users 订阅好友状态一次不能超过100个
             try {
                 usersArr.length > 0 &&
@@ -207,22 +219,21 @@ export const uesContacts = defineStore('contacts', {
                 const tobeCommitRes =
                     usersPresenceList.length > 0 &&
                     usersPresenceList.filter((p) => p.uid !== '') || []
-                console.log('resultData', resultData)
 
-            const friendList = this.contacts.friendList
-            tobeCommitRes.length > 0 &&
-            tobeCommitRes.forEach((item:any) => {
-                    const commonStatus = handlePresence(item)
-                    if (friendList[commonStatus.uid]) {
-                        friendList[commonStatus.uid].userStatus = commonStatus
-                    }
-                })
+                const friendList = this.contacts.friendList
+                tobeCommitRes.length > 0 &&
+                    tobeCommitRes.forEach((item: any) => {
+                        const commonStatus = handlePresence(item)
+                        if (friendList[commonStatus.uid]) {
+                            friendList[commonStatus.uid].userStatus = commonStatus
+                        }
+                    })
             } catch (error) {
                 console.log('>>>>>>订阅失败', error)
             }
         },
         //取消订阅
-        async unsubFriendsPresence (user:any) {
+        async unsubFriendsPresence(user: any) {
             const option = {
                 usernames: [...user]
             }
@@ -232,19 +243,20 @@ export const uesContacts = defineStore('contacts', {
             // })
         },
 
-        setGroupList (payload:any)  {
+        setGroupList(payload: any) {
             //init 为初始化获取 replenish 补充群列表（包括补充群详情）
             const { setType, data } = payload
             if (setType === 'init') {
+                this.contacts.groupList = {}
                 this.contacts.groupList = _.assign({}, data)
             }
             if (setType === 'replenish') {
-                const { id, name, disabled } = data
-                if (this.contacts.groupList[id]) {
-                    this.contacts.groupList[id].groupDetail = data
+                const { gid, name, disabled } = data
+                if (this.contacts.groupList[gid]) {
+                    this.contacts.groupList[gid].groupDetail = data
                 } else {
-                    this.contacts.groupList[id] = {
-                        groupid: id,
+                    this.contacts.groupList[gid] = {
+                        groupid: gid,
                         groupname: name,
                         disabled: disabled,
                         groupDetail: data
@@ -254,13 +266,71 @@ export const uesContacts = defineStore('contacts', {
             }
         },
 
-	},
+        //示例优化方向--减少群组详情的调用，转为更新本地群组详情数据
+        update_group_infos ( payload:any) {
+            console.log('>>>>>>开始修改', payload)
+            const { groupId, type, params } = payload
+            //key(群id)，type（群详情对应要修改的字段）
+            if (
+                this.contacts.groupList[groupId] &&
+                this.contacts.groupList[groupId].groupDetail
+            ) {
+                switch (type) {
+                    //修改群名
+                    case 'groupName':
+                        {
+                            console.log('>>>>>>进入群组名称修改')
+                            this.contacts.groupList[groupId].groupDetail.name = params
+                        }
+                        break
+                    case 'groupDescription':
+                        {
+                            this.contacts.groupList[groupId].groupDetail.description =
+                                params
+                        }
+                        break
+                    case 'addAffiliationsCount':
+                        {
+                            this.contacts.groupList[
+                                groupId
+                            ].groupDetail.affiliations_count =
+                                this.contacts.groupList[groupId].groupDetail
+                                    .affiliations_count + 1
+                        }
+                        break
+                    case 'delAffiliationsCount':
+                        {
+                            this.contacts.groupList[
+                                groupId
+                            ].groupDetail.affiliations_count =
+                                this.contacts.groupList[groupId].groupDetail
+                                    .affiliations_count - 1
+                        }
+                        break
+                    default:
+                        break
+                }
+            }
+        },
+        //示例优化方向--更改本地群组列表群名(或其他状态)
+        update_group_list ( payload:any){
+            const { type, groupId, groupName } = payload
+            if (type === 'updateGroupName') {
+                console.log('>>>>>更新本地群组列表群名')
+                this.contacts.groupList[groupId].groupname = groupName
+            }
+            if (type === 'deleteFromList') {
+                console.log('>>>>>从本地群组列表中删除某个群')
+                this.contacts.groupList[groupId] && delete this.contacts.groupList[groupId]
+            }
+        }
+
+    },
 
     getters: {
-        storeFriendList(state){
+        storeFriendList(state) {
             return state.contacts.friendList
-       
         }
-        
+
     }
 });

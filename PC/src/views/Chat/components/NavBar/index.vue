@@ -3,6 +3,8 @@
 /* stores */
 import { useUserInfo } from '/@/stores/userInfo';
 const stores = useUserInfo();
+import { uesConversation } from '/@/stores/conversation';
+const conversationStore = uesConversation()
 
 /* router */
 import { useRoute ,useRouter} from 'vue-router'
@@ -37,9 +39,7 @@ const qrcodeShow = ref(false);
 console.log(stores.loginUserOnlineStatus)
 const loginUserOnlineStatusIcon = computed(() => {
     const loginUserOnlineStatus = stores.loginUserOnlineStatus
-  console.log(stores.loginUserOnlineStatus)
     if (loginUserOnlineStatus === 'Unset' || loginUserOnlineStatus === '') {
-      console.log(444)
         return ''
     } else {
       console.log(onLineStatus[loginUserOnlineStatus])
@@ -49,11 +49,11 @@ const loginUserOnlineStatusIcon = computed(() => {
 
 /* tabbar icon 路由跳转 */
 const skipRouterName = ref('conversation')
-const changeSkipRouterName = (routerName) => {
+const changeSkipRouterName = (routerName:string) => {
     router.push(`/chat/${routerName}`)
 }
 
-const getPath=(newPath)=>{
+const getPath=(newPath:string)=>{
   // 判断路径显示
   if (newPath.includes('/chat/conversation')) {
       skipRouterName.value = 'conversation'
@@ -65,14 +65,13 @@ const getPath=(newPath)=>{
 }
   getPath(route.path)
 watch(() => route.path, (newPath) => {
-  console.log(newPath,2222)
   getPath(newPath)
 })
 /* 取会话以及系统消息未读数控制会话icon badge显隐 */
 const conversationUnreadCount = computed(() => {
     const informCount =  0
-    // const informCount = _.sumBy(store.state.Conversation.informDetail, 'untreated') || 0
-    // const commonConversationCount = _.sumBy(_.values(store.state.Conversation.conversationListData), 'unreadMessageNum')
+    // const informCount = _.sumBy(conversationStore.informDetail, 'untreated') || 0
+    // const commonConversationCount = _.sumBy(_.values(conversationStore.conversationListData), 'unreadMessageNum')
     const commonConversationCount =0
     return { informCount, commonConversationCount }
 })
@@ -83,22 +82,22 @@ onClickOutside(changeUserInfoCard, () => (isShowUserInfoCard.value = false))
 
 
 /* 新建功能部分 */
-const settingComp = ref(null)
+const settingComp:any = ref(null)
 const settingPopover = ref(null)
 const modalType = ref('')
 const isShowPopover = ref(false)
 //新建功能相关icon
 onClickOutside(settingPopover, () => (isShowPopover.value = false))
-const showInputModal = (type) => {
+const showInputModal = (type:any) => {
     modalType.value = type
     settingComp.value.dialogVisible = true
     console.log('>>>>>>跳转对应modal')
 }
 
 /* 更多操作部分more_settings */
-const edituserinfo = ref(null)
-const personalsetting = ref(null)
-const logout = ref(null)
+const edituserinfo:any = ref(null)
+const personalsetting:any = ref(null)
+const logout:any = ref(null)
 //打开意见反馈发送邮箱页
 const toSendFeedback = () => window.open('')
 

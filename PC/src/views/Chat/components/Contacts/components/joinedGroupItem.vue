@@ -9,13 +9,14 @@ const contactsStore = uesContacts()
 const { CHAT_TYPE } = messageType
 //获取当前加入的群组列表
 const joinedGroupList = computed(() => contactsStore.contacts.groupList)
+console.log(joinedGroupList,888)
 </script>
 <template>
     <div class="joinedGroupItem_container">
         <el-row v-for=" groupItem in  joinedGroupList" :key="groupItem.groupid">
             <el-col class="groupItem_box" :span="24"
                 @click="$emit('toContacts', { id: groupItem.groupid, chatType: CHAT_TYPE.GROUP })">
-                <el-avatar style="margin-right: 11px;" :size="33.03" :src="defaultGroupAvatarUrl">
+                <el-avatar style="margin-right: 11px;" :size="33.03" :src="groupItem.avatar || defaultGroupAvatarUrl">
                 </el-avatar>
                 <span class="group_name">
                     {{ groupItem.groupname }}

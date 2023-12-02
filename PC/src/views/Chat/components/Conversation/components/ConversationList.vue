@@ -4,6 +4,7 @@ import dateFormater from '/@/utils/dateFormater'
 import { messageType } from '/@/constant'
 import _ from 'lodash'
 import { useRouter, useRoute } from 'vue-router'
+import { formatPast } from '/@/utils/formatTime';
 /* 头像相关 */
 import informIcon from '/@/assets/avatar/inform.png'
 /* route */
@@ -12,43 +13,98 @@ const route = useRoute()
 const router = useRouter()
 /* store */
 const { CHAT_TYPE } = messageType
+/* store */
+import { uesContacts } from '/@/stores/contacts';
+import { uesConversation } from '/@/stores/conversation';
+import { useUserInfo } from '/@/stores/userInfo';
+const userInfoStore = useUserInfo()
+const contactsStore = uesContacts()
+const conversationStore = uesConversation()
 //登录用户ID
-const loginUserId = 1
+const loginUserId = userInfoStore.userInfos.uid
 //取系统通知数据
 const informDetail = computed(() => {
-    const informDetailArr = []
+    const informDetailArr = conversationStore.informDetail
     const lastInformDeatail = informDetailArr[0] || {}
     const untreated = _.sumBy(informDetailArr, 'untreated') || 0
     return { untreated, lastInformDeatail }
 })
 // console.log('>>>>>informDetail', informDetail.lastInformDeatail)
-//取好友列表(主要使用好友下的用户属性相关)
-const friendList = computed(() => [])
+//好友列表
+const friendList = computed(() => contactsStore.contacts.friendList)
+//群组列表
+const joinedGroupList = computed(() => contactsStore.contacts.groupList)
 
-//取群组列表（展示群组名称）
-const joinedGroupList = computed(() => [])
-
+const baseUrl = import.meta.env.VITE_API_URL
 //取会话数据
 const conversationList = computed(() => {
-    return []
+    return conversationStore.conversationListData
 })
 
 //处理会话name
 const handleConversationName = computed(() => {
     return (item) => {
-        if (item.conversationType === CHAT_TYPE.SINGLE) {
-            const friend = friendList.value[item.conversationKey]
-            return friend?.username || item.conversationInfo.name
+        if (item.type === CHAT_TYPE.SINGLE) {
+            const friend = friendList.value[item.id]
+            return friend?.name || item.name
         }
-        if (item.conversationType === CHAT_TYPE.GROUP) {
-            const group = joinedGroupList.value[item.conversationKey]
+        if (item.type === CHAT_TYPE.GROUP) {
+            const group = joinedGroupList.value[item.id]
             if (group?.groupDetail) {
                 return group.groupDetail.name
-            } else if (group?.groupname) {
-                return group.groupname
+            } else if (group?.name) {
+                return group.name
             }
         }
         return item.conversationKey
+    }
+})
+
+const htmlDecode =  (text)=> {
+    text = text || '';
+    var map = {'&amp;': '&','&lt;': '<','&gt;': '>','&quot;': '"','&#039;': "'", '&nbsp;':' '};
+    return text.replace(/&amp;|&lt;|&gt;|&quot;|&#039;|&nbsp;/g, function(m) {return map[m];});
+};
+
+
+const textContent = (content)=>{
+
+    if (!content) {
+        return '';
+    }
+    content = content.replace(/\[表情\d+\]/g, '['+'表情'+']').replace(/@\[(.+?)\]\((\d+)\)/g, '@$1');
+    // 图片
+    if (/\!\[.*?\]\(([^\)]+?)\)/.test(content)) {
+        content = '['+'图片'+']';
+    } else if (/^voice\[\d+\]\(([^\)]+?)\)$/.test(content)) {
+        content = '['+'语音'+']';
+    } else if (/^voice\(([^\)]+?)\)$/.test(content)) {
+        content = '['+'语音'+']';
+    } else if (/^file\[(.*?)[\t|\|](.*?)]\((.+?)\)$/.test(content)) {
+        content = '['+'文件'+']';
+    } else if (/\[.*?\]\(([^\)]+?)\)/.test(content)) {
+        // 替换a连接
+        content = content.replace(/\[(.*?)\]\(([^\)]+?)\)/g, '$1');
+    }
+    return htmlDecode(content);
+}
+
+// 处理最后一条消息
+const lastMessage = computed(() => {
+    return (item) => {
+        item = item.items.length && item.items.slice(-1)[0];
+				if (!item) {
+					return {
+						content: '',
+						timestamp: 0
+					};
+				}
+				let content = textContent(item['content']);
+				return {
+                    name:item.name+':',
+					content: content,
+					timestamp:formatPast(item['timestamp']*1000)
+				};
     }
 })
 //处理lastmsg的from昵称
@@ -58,11 +114,11 @@ const handleLastMsgusername = computed(() => {
     return (conversation) => {
         const {
             conversationKey: groupId,
-            conversationType,
+            type,
             fromInfo
         } = conversation
         const { fromId } = fromInfo || {}
-        if (conversationType === CHAT_TYPE.GROUP) {
+        if (type === CHAT_TYPE.GROUP) {
             const userInfoFromGroupusername =
                 groupsInfos[groupId]?.groupMemberInfo?.[fromId]?.username
             const friendUserInfousername = friendList[fromId]?.username
@@ -81,13 +137,14 @@ const emit = defineEmits(['toInformDetails', 'toChatMessage'])
 //普通会话
 const checkedConverItemIndex = ref(null)
 const toChatMessage = (item, itemKey, index) => {
+    console.log(item)
     checkedConverItemIndex.value = index
     if (item && item.unreadMessageNum > 0)
-        // store.commit('CLEAR_UNREAD_NUM', itemKey)
-    // if (item.isMention) store.commit('CLEAR_AT_STATUS', itemKey)
+        store.commit('CLEAR_UNREAD_NUM', item.id)
+    if (item.isMention) store.commit('CLEAR_AT_STATUS', item.id)
     //跳转至对应的消息界面
 
-    emit('toChatMessage', itemKey, item.conversationType)
+    emit('toChatMessage', item.id, item.type)
 }
 //删除某条会话
 const deleteConversation = (itemKey) => {
@@ -134,7 +191,7 @@ const deleteConversation = (itemKey) => {
             </div>
             <div class="item_body item_right">
                 <span class="time">{{
-                    dateFormater(
+                    formatPast(
                         'MM/DD/HH:mm',
                         informDetail.lastInformDeatail.time
                     )
@@ -174,16 +231,29 @@ const deleteConversation = (itemKey) => {
                             <div class="item_body item_left">
                                 <div class="session_other_avatar">
                                     <el-avatar
+                                    v-if="item.type == 'friend'"
                                         :size="34"
                                         :src="
-                                            friendList[item.conversationKey] &&
-                                            friendList[item.conversationKey]
+                                            friendList[item.id] &&
+                                            friendList[item.id]
                                                 .avatar
                                                 ? friendList[
-                                                      item.conversationKey
+                                                      item.id
                                                   ].avatar
-                                                : item.conversationInfo
-                                                      .avatar
+                                                : item?item.avatar:''
+                                        "
+                                    >
+                                    </el-avatar>
+
+                                    <el-avatar
+                                    v-else
+                                        :size="34"
+                                        :src="
+                                            joinedGroupList[item.id] &&
+                                            joinedGroupList[item.id]
+                                                .avatar
+                                                ? baseUrl+joinedGroupList[item.id].avatar
+                                                : item?baseUrl+item.avatar:''
                                         "
                                     >
                                     </el-avatar>
@@ -201,21 +271,18 @@ const deleteConversation = (itemKey) => {
                                     >
                                     <span
                                         v-show="
-                                            item.conversationType ===
+                                            item.type ===
                                             CHAT_TYPE.GROUP
                                         "
-                                        >{{ handleLastMsgusername(item) }}</span
+                                        >{{ lastMessage(item).name }}</span
                                     >
-                                    {{ item.latestMessage.msg }}
+                                    {{ lastMessage(item).content}}
                                 </div>
                             </div>
                             <div class="item_body item_right">
-                                <span class="time">{{
-                                    dateFormater(
-                                        'MM/DD/HH:mm',
-                                        item.latestSendTime
-                                    )
-                                }}</span>
+                                <span class="time">
+                                    {{ lastMessage(item).timestamp|| ''}}
+                                </span>
                                 <span
                                     class="unReadNum_box"
                                     v-if="item.unreadMessageNum >= 1"

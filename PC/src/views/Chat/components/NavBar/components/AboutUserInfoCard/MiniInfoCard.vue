@@ -1,14 +1,15 @@
 <script setup>
 import { ref, computed } from 'vue'
 /* stores */
+
 import { useUserInfo } from '/@/stores/userInfo';
-const stores = useUserInfo();
+const userInfoStore = useUserInfo()
 const userInfos = computed(() => {
-    return stores.userInfos ?? {}
+    return userInfoStore.userInfos ?? {}
 })
 /* 组件 */
 import ShareMyInfoCard from './components/ShareMyInfoCard.vue'
-const loginUserId = computed(() => { return stores.userInfos.uid })
+const loginUserId = computed(() => { return userInfoStore.userInfos.uid })
 const bodyIcon = '@/assets/images/gender/Group76.png'
 const girlIcon = '@/assets/images/gender/Group77.png'
 const genderIcon = {

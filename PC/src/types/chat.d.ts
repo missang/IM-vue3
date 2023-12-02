@@ -24,12 +24,30 @@ interface FriendList {
 		userStatus:string
 	},
 }
+interface MessageList {
+		messageList:Array
+}
+
+interface Conversation {
+	conversationListData:{
+		[axis: string]: {
+			unreadMessageNum?:number,
+			isMention?:boolean
+		},
+	},
+	informDetail:Array
+}
+
 interface groupList {
     [axis: string]: {
 		groupname: string,
 		disabled: boolean,
 		groupid:number,
-		groupDetail:Object
+		groupDetail:{
+			name:string,
+description:Object,
+affiliations_count:number
+		}
 	},
 }
 declare interface Contacts<T = any> {
@@ -38,8 +56,7 @@ declare interface Contacts<T = any> {
 			[axis: string]: FriendList
 		},
 		groupList: groupList,
-		friendBlackList: Array,
-		conversationListData:Array
+		friendBlackList: Array
 	};
 }
 

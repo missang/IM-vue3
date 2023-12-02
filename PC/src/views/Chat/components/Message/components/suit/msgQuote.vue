@@ -41,7 +41,7 @@
 import { ref, reactive, computed } from 'vue'
 import messageType from '/@/constant/messageType'
 import useGetUserMapInfo from '/@/hooks/useGetUserMapInfo'
-const { getTheGroupusernameById, getLoginusernameById } = useGetUserMapInfo()
+const { getTheGroupNickNameById, getLoginNickNameById } = useGetUserMapInfo()
 const { ALL_MESSAGE_TYPE, SESSION_MESSAGE_TYPE, CHAT_TYPE } = messageType
 /* stores */
 import { useUserInfo } from '/@/stores/userInfo';
@@ -74,7 +74,7 @@ const extractMessageBodyValue = (sourceMsg) => {
         //判断消息引用来源是否为群组，如果是群组，则从群组中获取群组属性。
         const groupId =
             sourceMsg.chatType === CHAT_TYPE.GROUP ? sourceMsg.to : ''
-        msgQuote.msgSender = getTheGroupusernameById(groupId, from)
+        msgQuote.msgSender = getTheGroupNickNameById(groupId, from)
     }
     if (type === ALL_MESSAGE_TYPE.IMAGE) {
         quoteImageUrl.thumb = sourceMsg.thumb

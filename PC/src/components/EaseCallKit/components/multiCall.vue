@@ -287,7 +287,7 @@ const joinChannel = async () => {
         startInChannelTimer()
         console.log('%c加入channel当中', 'color:green')
         inChannelUsersList.push({
-            easeimUserId: loginUserHxId.value,
+            MEIMUserId: loginUserHxId.value,
             agoraUserId: agoraUserId.toString(),
             volume: 0, //音量
             muteStatus: false,
@@ -349,7 +349,7 @@ const handleRemoteContainer = (handleType, userUid) => {
                 console.log('>>>>包含该用户的对应信息')
                 //包含直接进行添加
                 inChannelUsersList.push({
-                    easeimUserId: channelUsers[userUid],
+                    MEIMUserId: channelUsers[userUid],
                     agoraUserId: userUid.toString(),
                     volume: 0,
                     muteStatus: false,
@@ -362,7 +362,7 @@ const handleRemoteContainer = (handleType, userUid) => {
                     const channelUsers =
                         callKitStatus.value.channelInfos.channelUsers
                     inChannelUsersList.push({
-                        easeimUserId: channelUsers[userUid],
+                        MEIMUserId: channelUsers[userUid],
                         agoraUserId: userUid.toString(),
                         volume: 0,
                         muteStatus: false,
@@ -395,7 +395,7 @@ const updateInChannelUserStatus = (handleType, userUid, data) => {
         const _index =
             inChannelUsersList.length > 0 &&
             inChannelUsersList.findIndex(
-                (item) => item.easeimUserId === mapHxId
+                (item) => item.MEIMUserId === mapHxId
             )
         if (handleType === 'volume') {
             console.log('>>>>>更改音量状态', userUid, data)
@@ -430,7 +430,7 @@ const checkVolume = (result) => {
         if (mapHxId) {
             // console.log('+++++拿到具体的值', channelUsers[uid], loginUserHxId.value);
             const nowUidChannelInfo = inChannelUsersList.filter(
-                (item) => item.easeimUserId === mapHxId
+                (item) => item.MEIMUserId === mapHxId
             )
             // console.log('nowUidChannelInfo', toRaw(nowUidChannelInfo[0]));
             if (toRaw(nowUidChannelInfo[0]).volume === 1 && level * 1 >= 5)
@@ -505,7 +505,7 @@ onBeforeUnmount(() => {
                 >
                     <div class="userInfo">
                         <!-- 用户名 暂时选择展示为环信ID，具体可自己定义。 -->
-                        <span class="userIMId">{{ item.easeimUserId }}</span>
+                        <span class="userIMId">{{ item.MEIMUserId }}</span>
                         <span class="muteStatus" v-show="item.muteStatus"
                             >已闭麦</span
                         >

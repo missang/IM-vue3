@@ -12,16 +12,17 @@ import InputBox from './components/inputBox/index.vue'
 import UserStatus from '/@/components/UserStatus/index.vue'
 import GroupsDetails from '/@/views/Chat/components/AboutGroups/GroupsDetails/index.vue'
 /* store */
-import { useGroups } from '/@/stores/goups';
 import { uesContacts } from '/@/stores/contacts';
+import {uesStoreMessage} from '/@/stores/message';
+import { useGroups } from '/@/stores/goups';
 const contactsStore = uesContacts()
+const MessageStore = uesStoreMessage();
 const groupsStore = useGroups()
 /* route */
 const route = useRoute()
 const { CHAT_TYPE } = messageType
-const { EASEIM_HINT, SWINDLER_GO_DIE, WARM_TIP } = warningText
+const { IM_PC_HINT, SWINDLER_GO_DIE, WARM_TIP } = warningText
 const nowPickInfo = ref({})
-console.log(contactsStore.storeFriendList,123456)
 const friendList = computed(() => contactsStore.storeFriendList)
 const groupList = computed(() => contactsStore.contacts.groupList)
 /* header 操作 */
@@ -31,7 +32,6 @@ const handleDrawer = () => {
 }
 //删除好友
 const delTheFriend = () => {
-    console.log(nowPickInfo.value)
     if (nowPickInfo.value?.id) {
         const targetId = nowPickInfo.value.id
         // EaseChatClient.deleteContact(targetId)
@@ -56,6 +56,7 @@ onMounted(() => {
 /* userInfo */
 //获取路由ID对应的信息
 const getIdInfo = async ({ id, chatType }) => {
+    console.log(id, chatType,8989)
     //类型为单聊
     if (chatType === CHAT_TYPE.SINGLE) {
         if (friendList.value[id]) {
@@ -65,20 +66,22 @@ const getIdInfo = async ({ id, chatType }) => {
         }
     }
     // //类型为群组
-    // if (chatType === CHAT_TYPE.GROUP) {
-    //     const goupid =
-    //         groupList.value[id]?.groupid && groupList.value[id]?.groupid
-    //     goupid && (await groupsStore().fetchMultiGoupsInfos(goupid))
-    //     if (groupList.value[id]?.groupDetail) {
-    //         return (nowPickInfo.value.groupDetail =
-    //             groupList.value[id].groupDetail)
-    //     } else {
-    //         //如果不存在用户属性则请求获取该群群详情。
-    //         await groupsStore().getAssignGroupDetail(id)
-    //         return (nowPickInfo.value.groupDetail =
-    //             groupList.value[id].groupDetail)
-    //     }
-    // }
+    if (chatType === CHAT_TYPE.GROUP) {
+        // TODO:
+        // const goupid =
+        //     groupList.value[id]?.groupid && groupList.value[id]?.groupid
+        // goupid && (await groupsStore.fetchMultiGoupsInfos(goupid))
+        console.log(groupList.value[id],6666)
+        if (groupList.value[id]?.groupDetail) {
+            return (nowPickInfo.value.groupDetail =
+                groupList.value[id].groupDetail)
+        } else {
+            //如果不存在用户属性则请求获取该群群详情。
+            await contactsStore.getAssignGroupDetail(id)
+            return (nowPickInfo.value.groupDetail =
+                groupList.value[id].groupDetail)
+        }
+    }
 }
 //监听路由改变获取对应的getIdInfo
 const stopWatchRoute = watch(
@@ -87,19 +90,18 @@ const stopWatchRoute = watch(
         console.log('>>>>>>>>监听到路由参数变化', routeVal)
         if (routeVal) {
             nowPickInfo.value = { ...routeVal }
-            getIdInfo(routeVal)
+           getIdInfo(routeVal)
         }
     },
     {
         immediate: true
     }
 )
-getIdInfo(route.query)
 //获取群组详情
 const groupDetail = computed(
     () =>
         (groupList.value[nowPickInfo.value.id] &&
-            groupList.value[nowPickInfo.value.id].groupDetail) ||
+            groupList.value[nowPickInfo.value.id]) ||
         {}
 )
 //离开该路由销毁route监听
@@ -114,57 +116,53 @@ const notScrollBottom = ref(false) //是否滚动置底
 const fechHistoryMessage = (loadType) => {
     if (!nowPickInfo.value) return []
     return async () => {
-        // loadingHistoryMsg.value = true
-        // notScrollBottom.value = true
-        // if (loadType == 'fistLoad') {
-        //     const { messages } = await store.dispatch('getHistoryMessage', {
-        //         ...nowPickInfo.value,
-        //         cursor: -1
-        //     })
-        //     const { messages } = await store.dispatch('getHistoryMessage', {
-        //         ...nowPickInfo.value,
-        //         cursor: -1
-        //     })
-        //     if (messages.length > 0) {
-        //         //返回数组有数据显示加载更多
-        //         isMoreHistoryMsg.value = true
-        //     } else {
-        //         //否则已无更多。
-        //         isMoreHistoryMsg.value = false
-        //     }
-        //     setTimeout(() => {
-        //         scrollMessageList('bottom')
-        //     }, 500)
-        // } else {
-        //     const fistMessageId =
-        //         messageData.value[0] && messageData.value[0].id
-        //     const { messages } = await store.dispatch('getHistoryMessage', {
-        //         ...nowPickInfo.value,
-        //         cursor: fistMessageId
-        //     })
-        //     if (messages.length > 0) {
-        //         //返回数组有数据显示加载更多
-        //         isMoreHistoryMsg.value = true
-        //     } else {
-        //         //否则已无更多。
-        //         isMoreHistoryMsg.value = false
-        //     }
-        //     scrollMessageList('normal')
-        // }
-        // loadingHistoryMsg.value = false
-        // notScrollBottom.value = false
+        loadingHistoryMsg.value = true
+        notScrollBottom.value = true
+        if (loadType == 'fistLoad') {
+
+            const { messages } = await MessageStore.getHistoryMessage({
+                ...nowPickInfo.value,
+                // cursor: -1
+            })
+            if (messages && messages.length > 0) {
+                //返回数组有数据显示加载更多
+                isMoreHistoryMsg.value = true
+            } else {
+                //否则已无更多。
+                isMoreHistoryMsg.value = false
+            }
+            setTimeout(() => {
+                scrollMessageList('bottom')
+            }, 500)
+        } else {
+            const fistMessageId =
+                messageData.value[0] && messageData.value[0].id
+            const { messages } = await MessageStore.getHistoryMessage({
+                ...nowPickInfo.value,
+                cursor: fistMessageId
+            })
+            if (messages.length > 0) {
+                //返回数组有数据显示加载更多
+                isMoreHistoryMsg.value = true
+            } else {
+                //否则已无更多。
+                isMoreHistoryMsg.value = false
+            }
+            scrollMessageList('normal')
+        }
+        loadingHistoryMsg.value = false
+        notScrollBottom.value = false
     }
 }
 //获取其id对应的消息内容
 const messageData = computed(() => {
     //如果Message.messageList中不存在的话调用拉取漫游取一下历史消息
-        // return (
-        //     (nowPickInfo.value.id &&
-        //         store.state.Message.messageList[nowPickInfo.value.id]) ||
-        //     fechHistoryMessage('fistLoad')()
-        // )
+        return (
+            (nowPickInfo.value.id &&
+                MessageStore.messageList[nowPickInfo.value.id]) ||
+            fechHistoryMessage('fistLoad')()
+        )
 })
-
 const messageContainer = ref(null)
 //控制消息滚动
 const scrollMessageList = (direction) => {
@@ -192,7 +190,7 @@ watch(
     () => messageData,
     (newMsg, oldMsg) => {
         nextTick(() => {
-            console.log('>>>>>监听到消息变化', notScrollBottom.value)
+            console.log('>>>>>监听到消息变化', notScrollBottom.value,oldMsg)
             //判断拉取漫游导致的消息变化不需要执行滚动置底
             if (notScrollBottom.value) {
                 return
@@ -229,6 +227,7 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
 <template>
     <el-container class="app_container">
         <el-header class="chat_message_header">
+
             <template v-if="nowPickInfo.chatType === CHAT_TYPE.SINGLE">
                 <div v-if="nowPickInfo.userInfo" class="chat_user_box">
                     <span class="chat_user_name">
@@ -239,20 +238,20 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
                     <UserStatus :userStatus="nowPickInfo.userInfo.userStatus" />
                 </div>
                 <div v-else>
-                    {{ nowPickInfo
+                    {{ nowPickInfo.id
                     }}<span style="font-size: 10px">(非好友)</span>
                 </div>
             </template>
             <template v-if="nowPickInfo.chatType === CHAT_TYPE.GROUP">
                 <div v-if="nowPickInfo.groupDetail" class="chat_user_box">
                     <span class="chat_user_name">
-                        {{ groupDetail.name || '' }}
-                        {{ `(${groupDetail?.affiliations_count || ''})` }}
+                        {{ groupDetail.groupname || '' }}
+                        {{ `(${groupDetail?.groupDetail?.count || ''})` }}
                     </span>
                 </div>
                 <div v-else class="chat_user_box">
                     <span class="chat_user_name">
-                        {{ groupDetail.name || nowPickInfo.id }}
+                        {{ groupDetail.groupname || nowPickInfo.id }}{{ groupDetail?.groupDetail?.count }}
                     </span>
                 </div>
             </template>
@@ -304,8 +303,8 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
                 </el-dropdown>
             </span>
         </el-header>
-        <!-- <div v-if="isShowWarningTips" class="easeim_safe_tips">
-            <p>{{ EASEIM_HINT }}</p>
+        <!-- <div v-if="isShowWarningTips" class="IM_PC_safe_tips">
+            <p>{{ IM_PC_HINT }}</p>
             <p>【防骗提示】{{ randomTips }}</p>
             <p
                 v-show="
@@ -315,7 +314,7 @@ const messageQuote = (msg) => inputBox.value.handleQuoteMessage(msg)
             >
                 {{ WARM_TIP }}
             </p>
-            <span class="easeim_close_tips" @click="closeWarningTips">
+            <span class="IM_PC_close_tips" @click="closeWarningTips">
                 <el-icon>
                     <Close />
                 </el-icon>

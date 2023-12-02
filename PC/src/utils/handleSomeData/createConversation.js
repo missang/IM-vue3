@@ -1,8 +1,11 @@
 /* 会话列表总装车间 */
 import _ from 'lodash'
 // import store from '@/store'
-import { uesContacts } from '/@/stores/contacts';
+import { uesConversation } from '/@/stores/conversation';
 import { messageType } from '/@/constant'
+
+import { uesContacts } from '/@/stores/contacts';
+import { useUserInfo } from '/@/stores/userInfo';
 
 
 import defaultGroupAvatarUrl from '/@/assets/avatar/jiaqun2x.png'
@@ -83,6 +86,8 @@ const handleCalcUnReadNum = (msgBody, toDoUpdateConversation) => {
 }
 export default function (corresMessage) {
     const contactsStore = uesContacts()
+    const conversationStore = uesConversation()
+    const userInfoStore = useUserInfo()
     /*
      * 1、取到messageList更新后的最后一套消息
      * 2、取会话列表数据进行与当前的messageList进行比对查看messaList中的Key是否已经存在于已有的Conversation中。
@@ -102,7 +107,7 @@ export default function (corresMessage) {
         //存在则更新
         else if (localConversationList && localConversationList[listKey]) {
             const theData = _.cloneDeep(
-                contactsStore.contacts.conversationListData[listKey]
+                conversationStore.conversationListData[listKey]
             )
             const updatedCoversation = buildConversationItem(
                 'update',
@@ -118,7 +123,7 @@ export default function (corresMessage) {
         //type create构建 update更新
         /**
   * 
-  * conversationType: "" 会话类型
+  * type: "" 会话类型
   * conversationInfo: { 会话信息详情
       *  name: ,
       * avatarUrl:
@@ -133,13 +138,13 @@ export default function (corresMessage) {
     latestMessageId: "", 最近消息的消息mid
     latestSendTime:"", 最近一条消息的发送时间,
    */
-        const loginUserId = 0
+        const loginUserId = userInfoStore.userInfos.uid
         const listKey = setMessageKey(msgBody)
         const { chatType, from, ext, id, time, to, type } = msgBody
         //操作类型为新建
         if (operateType === 'create') {
             const state = {
-                conversationType: chatType,
+                type: chatType,
                 conversationKey: listKey,
                 conversationInfo: {
                     name: '',
@@ -174,12 +179,12 @@ export default function (corresMessage) {
                 latestSendTime: time || Date.now()
             }
             if (chatType === CHAT_TYPE.GROUP) {
-                // const groupInfo = store.state.Contacts.groupList[to]
-                // groupInfo?.groupname &&
-                //     (state.conversationInfo.name = groupInfo.groupname)
+                const groupInfo = contactsStore.contacts.groupList[to]
+                groupInfo?.groupname &&
+                    (state.conversationInfo.name = groupInfo.groupname)
             } else if (chatType === CHAT_TYPE.SINGLE) {
                 //to字段 暂时选择展示为ID
-                // state.conversationInfo.name = to === loginUserId ? from : to
+                state.conversationInfo.name = to === loginUserId ? from : to
             }
             return state
         }

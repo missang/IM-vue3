@@ -46,11 +46,11 @@ const querySearch = () => {
             const resObj = {}
             const resultList = _.filter(props.searchData, (o) => o.conversationInfo.name.includes(inputValue.value))
             resultList.length > 0 && resultList.forEach(item => {
-                if (resObj[item.conversationType]) {
-                    resObj[item.conversationType].push(item)
+                if (resObj[item.type]) {
+                    resObj[item.type].push(item)
                 } else {
-                    resObj[item.conversationType] = []
-                    resObj[item.conversationType].push(item)
+                    resObj[item.type] = []
+                    resObj[item.type].push(item)
                 }
             })
             searchSuggest.value = resObj
@@ -106,7 +106,7 @@ const emitConversation = (fromType, item) => {
         emit('toChatMessage', item.value, item.chatType)
     }
     if (fromType === 1) {
-        const searchItem = { label: item.conversationInfo.name, value: item.conversationKey, chatType: item.conversationType }
+        const searchItem = { label: item.conversationInfo.name, value: item.conversationKey, chatType: item.type }
         const _rawSearchHistory = _.cloneDeep(toRaw(searchHistory.value))
         console.log('searchHistory', _rawSearchHistory)
         if (_rawSearchHistory.length === 0 || _rawSearchHistory === null) {
@@ -127,7 +127,7 @@ const emitConversation = (fromType, item) => {
 
 
         }
-        emit('toChatMessage', item.conversationKey, item.conversationType)
+        emit('toChatMessage', item.conversationKey, item.type)
     }
     inputValue.value = ''
     searchSuggest.value = []

@@ -38,19 +38,20 @@
 		</el-form-item>
 		<div class="font12 mt30 login-animation4 login-msg">{{ $t('browserMsgText') }}</div>
 	</el-form>
-	<Verify @success="verifySuccess" :mode="'pop'" :captchaType="'blockPuzzle'" :imgSize="{ width: '330px', height: '155px' }" ref="verifyref" />
+	<!-- <Verify @success="verifySuccess" :mode="'pop'" :captchaType="'blockPuzzle'" :imgSize="{ width: '330px', height: '155px' }" ref="verifyref" /> -->
 </template>
 
 <script setup lang="ts" name="password">
 import { reactive, defineAsyncComponent, ref, defineEmits } from 'vue';
 import { useUserInfo } from '/@/stores/userInfo';
+import { uesContacts } from '/@/stores/contacts';
 import { useI18n } from 'vue-i18n';
 
 // 使用国际化插件
 const { t } = useI18n();
 
 // 动态加载滑块验证码组件
-const Verify = defineAsyncComponent(() => import('/@/components/Verifition/Verify.vue'));
+// const Verify = defineAsyncComponent(() => import('/@/components/Verifition/Verify.vue'));
 
 // 定义变量内容
 const emit = defineEmits(['signInSuccess']); // 声明事件名称
@@ -72,19 +73,19 @@ const loginRules = reactive({
 	password: [{ required: true, trigger: 'blur', message: t('password.accountPlaceholder2') }], // 密码校验规则
 });
 
-const verifyref = ref<InstanceType<typeof Verify>>(null); // 定义verify组件引用
+// const verifyref = ref<InstanceType<typeof Verify>>(null); // 定义verify组件引用
 // 是否开启验证码
 const verifyEnable = ref(import.meta.env.VITE_VERIFY_ENABLE === 'true');
 
 // 调用滑块验证码进行校验
 const handleVerify = async () => {
 	const valid = await loginFormRef.value.validate().catch(() => {}); // 表单校验
-
-	if (valid && verifyEnable.value) {
-		verifyref.value.show(); // 显示验证组件
-	} else if (valid) {
+	if (valid) {
 		onSignIn(); // 调用登录方法
 	}
+	// if (valid && verifyEnable.value) {
+	// 	verifyref.value.show(); // 显示验证组件
+	// } 
 };
 
 // 滑块验证码校验成功调用后台登录接口
@@ -99,6 +100,7 @@ const onSignIn = async () => {
 	try {
 		await useUserInfo().login(state.ruleForm); // 调用登录方法
 		await useUserInfo().setUserInfos();
+			await uesContacts().getBaseChat()
 		emit('signInSuccess'); // 触发事件
 	} finally {
 		loading.value = false; // 登录结束

@@ -13,6 +13,8 @@ import { sortPinyinFriendItem } from '/@/utils/handleSomeData'
 /* store */
 import { useGroups } from '/@/stores/goups';
 import { uesContacts } from '/@/stores/contacts';
+import { useUserInfo } from '/@/stores/userInfo';
+const userInfoStore = useUserInfo()
 const contactsStore = uesContacts()
 const groupsStore = useGroups()
 import _ from 'lodash'
@@ -38,7 +40,7 @@ const { groupDetail, memberRole } = toRefs(props)
  * 中间涉及到一些权限判断，大量使用了 v-if 后续建议挪到计算属性中处理。
  **/
 /* 当前登陆的id */
-const loginUserId = computed(() => EaseChatClient.user)
+const loginUserId = computed(() => userInfoStore.userInfos.uid)
 /* 数据获取 */
 //群组成员
 const groupMembers = computed(() => {

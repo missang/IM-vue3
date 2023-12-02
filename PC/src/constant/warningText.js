@@ -32,8 +32,8 @@ const SWINDLER_GO_DIE = [
     '陌⽣信息不要理，以防害⼈⼜害⼰。',
 ]
 
-const EASEIM_HINT =
+const IM_PC_HINT =
   '【安全提示】本应用仅用于产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！'
 
 const WARM_TIP = '【温馨提示】该群仅供试用，72小时后将被删除！'
-export default { SWINDLER_GO_DIE, EASEIM_HINT, WARM_TIP }
+export default { SWINDLER_GO_DIE, IM_PC_HINT, WARM_TIP }
